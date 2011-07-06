@@ -1,5 +1,6 @@
-package testrunner;
+package fi.helsinki.cs.tmc.testrunner;
 
+import fi.helsinki.cs.tmc.testrunner.Exercise;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

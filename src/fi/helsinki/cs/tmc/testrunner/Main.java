@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package testrunner;
+package fi.helsinki.cs.tmc.testrunner;
 
 import com.google.gson.Gson;
 import java.io.FileNotFoundException;

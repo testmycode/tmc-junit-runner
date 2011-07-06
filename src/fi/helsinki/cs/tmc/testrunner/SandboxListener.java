@@ -1,4 +1,4 @@
-package testrunner;
+package fi.helsinki.cs.tmc.testrunner;
 
 import java.util.ArrayList;
 import org.junit.runner.Description;

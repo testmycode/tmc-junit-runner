@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package testrunner;
+package fi.helsinki.cs.tmc.testrunner;
 
 import java.io.File;
 import java.lang.reflect.Method;

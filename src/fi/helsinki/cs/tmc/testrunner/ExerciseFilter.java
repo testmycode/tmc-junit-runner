@@ -1,4 +1,4 @@
-package testrunner;
+package fi.helsinki.cs.tmc.testrunner;
 
 import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
