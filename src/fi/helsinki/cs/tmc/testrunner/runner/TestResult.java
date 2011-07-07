@@ -1,13 +1,8 @@
-
-package fi.helsinki.cs.tmc.testrunner;
+package fi.helsinki.cs.tmc.testrunner.runner;
 
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 
-/**
- *
- * @author mrannanj
- */
 public class TestResult
 {
 	public String methodName;

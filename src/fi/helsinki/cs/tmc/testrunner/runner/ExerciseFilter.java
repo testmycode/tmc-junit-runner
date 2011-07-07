@@ -1,5 +1,6 @@
-package fi.helsinki.cs.tmc.testrunner;
+package fi.helsinki.cs.tmc.testrunner.runner;
 
+import fi.helsinki.cs.tmc.testrunner.annotation.Exercise;
 import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 
@@ -19,7 +20,7 @@ public class ExerciseFilter extends Filter {
 	@Override
 	public String describe()
 	{
-		return "Filters tests based on exercise";
+		return "Filters tests based on @Exercise annotation";
 	}
 
 	@Override

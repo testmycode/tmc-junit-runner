@@ -1,4 +1,4 @@
-package fi.helsinki.cs.tmc.testrunner;
+package fi.helsinki.cs.tmc.testrunner.testclasses;
 
 public class MyString {
 

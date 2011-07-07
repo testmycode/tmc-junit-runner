@@ -4,6 +4,8 @@
  */
 package fi.helsinki.cs.tmc.testrunner;
 
+import fi.helsinki.cs.tmc.testrunner.runner.TestRunner;
+import fi.helsinki.cs.tmc.testrunner.runner.TestResult;
 import com.google.gson.Gson;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -72,10 +74,10 @@ public class Main {
 	private static void listExercises(String classpath, String classname)
 		throws MalformedURLException, ClassNotFoundException
 	{
-		TestRunner runner = new TestRunner(classpath, classname);
-		TreeSet<String> exercises = runner.listExercises();
-		Gson gson = new Gson();
-		resultsStream.println(gson.toJson(exercises));
+		//TestRunner runner = new TestRunner(classpath, classname);
+		//TreeSet<String> exercises = runner.listExercises();
+		//Gson gson = new Gson();
+		//resultsStream.println(gson.toJson(exercises));
 	}
 
 	private static void runExercises(String classpath, String classname)

@@ -1,4 +1,4 @@
-package fi.helsinki.cs.tmc.testrunner;
+package fi.helsinki.cs.tmc.testrunner.runner;
 
 import java.util.ArrayList;
 import org.junit.runner.Description;
@@ -6,20 +6,11 @@ import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author mrannanj
- */
-public class SandboxListener extends RunListener {
+public class TestListener extends RunListener {
 
 	ArrayList<TestResult> results;
 
-	public SandboxListener(ArrayList<TestResult> results)
+	public TestListener(ArrayList<TestResult> results)
 	{
 		this.results = results;
 	}
