@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.processing.Processor;
 import javax.tools.JavaCompiler;
@@ -63,6 +64,10 @@ public class TestScanner {
 	}
 	
 	public List<TestMethod> findTests() {
+		if (sourceFiles.isEmpty()) {
+			return Collections.emptyList();
+		}
+		
 		JavaCompiler.CompilationTask task = compiler.getTask(
 				null,
 				null,
