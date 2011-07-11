@@ -1,6 +1,7 @@
 package fi.helsinki.cs.tmc.testscanner;
 
 import com.google.gson.Gson;
+import fi.helsinki.cs.tmc.testscanner.TestMethod;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -9,6 +10,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -60,7 +62,12 @@ public class TestScannerServer {
 			testScanner.addSource(new File(line));
 		}
 		
-		List<TestMethod> testMethods = testScanner.findTests();
+		List<TestMethod> testMethods = Collections.emptyList();
+		try {
+			testMethods = testScanner.findTests();
+		} catch (RuntimeException e) {
+			System.err.println(e);
+		}
 		
 		writeOutput(sock, testMethods);
 		
