@@ -9,6 +9,14 @@
 <!-- in the project's Project Properties dialog box.-->
 <project name="tmc-javalib" default="default" basedir=".">
     <description>Builds, tests, and runs the project tmc-javalib.</description>
+    <fail message="Please build using Ant 1.8.0 or higher.">
+        <condition>
+            <not>
+                <antversion atleast="1.8.0"/>
+            </not>
+        </condition>
+    </fail>
+	<!-- Or maybe just rewrite the necessary parts and delete build-impl.xml -->
     <import file="nbproject/build-impl.xml"/>
     <!--
 
