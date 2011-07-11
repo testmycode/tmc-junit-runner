@@ -36,7 +36,15 @@ public class TestScanner {
 		
 	}
 	
-	private ArrayList<File> sourceFiles = new ArrayList<File>();
+	private ArrayList<File> sourceFiles;
+	private JavaCompiler compiler;
+	private StandardJavaFileManager fileMan;
+
+	public TestScanner() {
+		sourceFiles = new ArrayList<File>();
+		compiler = ToolProvider.getSystemJavaCompiler();
+		fileMan = ToolProvider.getSystemJavaCompiler().getStandardFileManager(null, null, null);
+	}
 	
 	public void addSource(File fileOrDir) {
 		if (fileOrDir.isDirectory()) {
@@ -50,16 +58,17 @@ public class TestScanner {
 		}
 	}
 	
+	public void clearSources() {
+		sourceFiles.clear();
+	}
+	
 	public List<TestMethod> findTests() {
-		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-		StandardJavaFileManager fileMan = ToolProvider.getSystemJavaCompiler().getStandardFileManager(null, null, null);
-		
 		JavaCompiler.CompilationTask task = compiler.getTask(
 				null,
 				null,
 				null,
 				Arrays.asList(new String[] {"-proc:only"}),
-				null,//Arrays.asList(AnnotationProcessor.class.getCanonicalName()),
+				null,
 				fileMan.getJavaFileObjectsFromFiles(sourceFiles)
 				);
 		
