@@ -1,5 +1,8 @@
 package fi.helsinki.cs.tmc.testrunner.testclasses;
 
+import java.io.File;
+import java.io.IOException;
+
 public class MyString {
 
     public static final int MAKSIMIPITUUS = 100; // pisin mahdollinen merkkijono
@@ -24,9 +27,8 @@ public class MyString {
             this.mjono[i] = s.charAt(i);
     }
 
-    public int length()
-    {
-        return this.pituus;
+    public int length() {
+	    return this.pituus;
     }
 
     public char charAt(int i)

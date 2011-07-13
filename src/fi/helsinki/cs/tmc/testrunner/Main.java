@@ -7,13 +7,13 @@ package fi.helsinki.cs.tmc.testrunner;
 import fi.helsinki.cs.tmc.testrunner.runner.TestRunner;
 import fi.helsinki.cs.tmc.testrunner.runner.TestResult;
 import com.google.gson.Gson;
+import fi.helsinki.cs.tmc.testrunner.runner.TMCSecurityManager;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runners.model.InitializationError;
 
@@ -34,6 +34,8 @@ public class Main {
                 InitializationError, NoTestsRemainException,
                 FileNotFoundException
 	{
+		System.setSecurityManager(new TMCSecurityManager());
+
 		if (args.length < 3)
 		{
 			usage();
@@ -49,6 +51,15 @@ public class Main {
 			System.setOut(outStream);
 		}
 
+		long timeout = 60;
+		if (args.length >= 6)
+		{
+			try {
+				timeout = Integer.parseInt(args[5]);
+			} catch (NumberFormatException e) {}
+		}
+		timeout *= 1000;
+
 		String command = args[0];
 		String classpath = args[1];
 		String classname = args[2];
@@ -56,7 +67,7 @@ public class Main {
 		if (command.equals("list")) {
 			listExercises(classpath, classname);
 		} else if (command.equals("run")) {
-			runExercises(classpath, classname);
+			runExercises(classpath, classname, timeout);
 		} else {
 			usage();
 			return;
@@ -68,7 +79,8 @@ public class Main {
 
 	private static void usage()
 	{
-		outStream.println("Usage: ./testrunner <list|run> classpath classname");
+		outStream.println("Usage: ./testrunner <list|run> classpath" +
+			" classname outfile resultsfile <timeout>");
 	}
 
 	private static void listExercises(String classpath, String classname)
@@ -80,14 +92,15 @@ public class Main {
 		//resultsStream.println(gson.toJson(exercises));
 	}
 
-	private static void runExercises(String classpath, String classname)
+	private static void runExercises(String classpath, String classname,
+		long timeout)
 		throws MalformedURLException, ClassNotFoundException,
 		InitializationError, NoTestsRemainException
 	{
 		TestRunner runner = new TestRunner(classpath, classname);
-		TreeMap<String, ArrayList<TestResult>> results =
-			runner.runTests();
 		Gson gson = new Gson();
+		TreeMap<String, ArrayList<TestResult>> results =
+			runner.runTests(timeout);
 		resultsStream.println(gson.toJson(results));
 	}
 }

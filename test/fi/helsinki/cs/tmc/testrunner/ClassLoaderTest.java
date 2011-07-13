@@ -1,7 +1,7 @@
 
 package fi.helsinki.cs.tmc.testrunner;
 
-import fi.helsinki.cs.tmc.testrunner.util.ClassLoader;
+import fi.helsinki.cs.tmc.testrunner.util.TMCClassLoader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import org.junit.Test;
@@ -14,7 +14,8 @@ public class ClassLoaderTest {
 		String classPath = "build/test/classes";
 		String className =
 			"fi.helsinki.cs.tmc.testrunner.testclasses.MyString";
-		Class result = ClassLoader.loadClass(classPath, className);
+		TMCClassLoader cl = TMCClassLoader.fromPath(classPath);
+		Class result = cl.loadClass(className);
 		assertNotNull(result);
 
 		ArrayList<String> foundMethodNames = new ArrayList<String>();

@@ -48,6 +48,7 @@ public class RunnerThread extends Thread {
 
 	@Override
 	public void run() {
+
 		this.exercises = listExercises();
 		try {
 			runTests();
@@ -55,6 +56,7 @@ public class RunnerThread extends Thread {
 
 		} catch (NoTestsRemainException ex) {
 		}
+
 	}
 
 	private void runTests() throws InitializationError, NoTestsRemainException {

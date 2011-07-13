@@ -5,14 +5,18 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-public class ClassLoader {
+public class TMCClassLoader extends URLClassLoader {
 
-	public static Class loadClass(String classPath, String className)
-		throws MalformedURLException, ClassNotFoundException
+	public TMCClassLoader(URL[] urls)
+	{
+		super(urls);
+	}
+
+	public static TMCClassLoader fromPath(String classPath)
+		throws MalformedURLException
 	{
                 File myFile = new File(classPath);
                 URL[] urls = { myFile.toURI().toURL() };
-                URLClassLoader cl = new URLClassLoader(urls);
-		return cl.loadClass(className);
+                return new TMCClassLoader(urls);
 	}
 }

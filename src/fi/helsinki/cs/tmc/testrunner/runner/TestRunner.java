@@ -5,17 +5,11 @@
 
 package fi.helsinki.cs.tmc.testrunner.runner;
 
-import fi.helsinki.cs.tmc.testrunner.annotation.Exercise;
-import fi.helsinki.cs.tmc.testrunner.util.ClassLoader;
-import java.lang.reflect.Method;
+import fi.helsinki.cs.tmc.testrunner.util.TMCClassLoader;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.TreeMap;
-import java.util.TreeSet;
-import org.junit.Test;
 import org.junit.runner.manipulation.NoTestsRemainException;
-import org.junit.runner.notification.RunNotifier;
-import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 
 /**
@@ -25,16 +19,17 @@ import org.junit.runners.model.InitializationError;
 public class TestRunner {
 
 	private Class testClass;
+	private ClassLoader classLoader;
 
 	public TestRunner(String testClassPath, String testClassName)
 		throws MalformedURLException, ClassNotFoundException
 	{
-		this.testClass =
-			ClassLoader.loadClass(testClassPath, testClassName);
+		this.classLoader = TMCClassLoader.fromPath(testClassPath);
+		this.testClass = this.classLoader.loadClass(testClassName);
 	}
 
 
-	public TreeMap<String, ArrayList<TestResult>> runTests()
+	public TreeMap<String, ArrayList<TestResult>> runTests(long timeout)
 		throws InitializationError, NoTestsRemainException
 	{
 		TreeMap<String, ArrayList<TestResult>> result =
@@ -45,7 +40,7 @@ public class TestRunner {
 
 		runnerThread.start();
 		try {
-			runnerThread.join();
+			runnerThread.join(timeout);
 		} catch (InterruptedException ignore) {
 		}
 
