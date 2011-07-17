@@ -33,8 +33,7 @@ public class TestScanner {
     }
 
     private static void showHelp() {
-        System.out.println("Usage: java ... " + TestScanner.class + " files-or-dirs");
-
+        System.out.println("Usage: java [...] " + TestScanner.class.getName() + " files-or-dirs");
     }
     
     private ArrayList<File> sourceFiles;
