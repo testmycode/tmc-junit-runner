@@ -1,7 +1,6 @@
 package fi.helsinki.cs.tmc.testscanner;
 
 import com.google.gson.Gson;
-import fi.helsinki.cs.tmc.testscanner.TestMethod;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -30,70 +29,71 @@ import java.util.Scanner;
  * <code>TestScanner</code> and closes the connection.
  */
 public class TestScannerServer {
-	public static void main(String[] args) throws IOException {
-		ServerSocket server = createListeningServerSocket();
-		TestScanner testScanner = new TestScanner();
-		
-		boolean shouldContinue = true;
-		while (shouldContinue) {
-			Socket sock = server.accept();
-			shouldContinue &= handleRequest(sock, testScanner);
-			testScanner.clearSources();
-		}
-	}
-	
-	private static ServerSocket createListeningServerSocket() throws IOException {
-		ServerSocket server = new ServerSocket();
-		server.bind(new InetSocketAddress("localhost", 0));
-		System.out.println(server.getLocalPort());
-		System.out.close();
-		return server;
-	}
-	
-	private static boolean handleRequest(Socket sock, TestScanner testScanner) throws IOException {
-		ArrayList<String> lines = readInput(sock);
-		sock.shutdownInput();
-		
-		if (lines.contains("SHUTDOWN!")) {
-			return false;
-		}
-		
-		for (String line : lines) {
-			testScanner.addSource(new File(line));
-		}
-		
-		List<TestMethod> testMethods = Collections.emptyList();
-		try {
-			testMethods = testScanner.findTests();
-		} catch (RuntimeException e) {
-			System.err.println(e);
-		}
-		
-		writeOutput(sock, testMethods);
-		
-		sock.close();
-		
-		return true;
-	}
-	
-	private static ArrayList<String> readInput(Socket sock) throws IOException {
-		Scanner inputScanner = new Scanner(sock.getInputStream(), "UTF-8");
-		ArrayList<String> lines = new ArrayList<String>();
-		while (inputScanner.hasNextLine()) {
-			String line = inputScanner.nextLine();
-			if (line.isEmpty()) {
-				break;
-			} else {
-				lines.add(line);
-			}
-		}
-		return lines;
-	}
 
-	private static void writeOutput(Socket sock, List<TestMethod> testMethods) throws IOException {
-		Writer writer = new OutputStreamWriter(sock.getOutputStream(), "UTF-8");
-		String json = new Gson().toJson(testMethods);
-		writer.write(json);
-		writer.flush();
-	}
+    public static void main(String[] args) throws IOException {
+        ServerSocket server = createListeningServerSocket();
+        TestScanner testScanner = new TestScanner();
+
+        boolean shouldContinue = true;
+        while (shouldContinue) {
+            Socket sock = server.accept();
+            shouldContinue &= handleRequest(sock, testScanner);
+            testScanner.clearSources();
+        }
+    }
+
+    private static ServerSocket createListeningServerSocket() throws IOException {
+        ServerSocket server = new ServerSocket();
+        server.bind(new InetSocketAddress("localhost", 0));
+        System.out.println(server.getLocalPort());
+        System.out.close();
+        return server;
+    }
+
+    private static boolean handleRequest(Socket sock, TestScanner testScanner) throws IOException {
+        ArrayList<String> lines = readInput(sock);
+        sock.shutdownInput();
+
+        if (lines.contains("SHUTDOWN!")) {
+            return false;
+        }
+
+        for (String line : lines) {
+            testScanner.addSource(new File(line));
+        }
+
+        List<TestMethod> testMethods = Collections.emptyList();
+        try {
+            testMethods = testScanner.findTests();
+        } catch (RuntimeException e) {
+            System.err.println(e);
+        }
+
+        writeOutput(sock, testMethods);
+
+        sock.close();
+
+        return true;
+    }
+
+    private static ArrayList<String> readInput(Socket sock) throws IOException {
+        Scanner inputScanner = new Scanner(sock.getInputStream(), "UTF-8");
+        ArrayList<String> lines = new ArrayList<String>();
+        while (inputScanner.hasNextLine()) {
+            String line = inputScanner.nextLine();
+            if (line.isEmpty()) {
+                break;
+            } else {
+                lines.add(line);
+            }
+        }
+        return lines;
+    }
+
+    private static void writeOutput(Socket sock, List<TestMethod> testMethods) throws IOException {
+        Writer writer = new OutputStreamWriter(sock.getOutputStream(), "UTF-8");
+        String json = new Gson().toJson(testMethods);
+        writer.write(json);
+        writer.flush();
+    }
 }

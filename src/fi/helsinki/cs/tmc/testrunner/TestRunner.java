@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package fi.helsinki.cs.tmc.testrunner;
 
 import java.io.File;
@@ -19,80 +14,67 @@ import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 
-/**
- *
- * @author mrannanj
- */
 public class TestRunner {
 
-	private Class testClass;
+    private Class testClass;
 
-	public TestRunner(String testClassPath, String testClassName)
-		throws MalformedURLException, ClassNotFoundException
-	{
-		loadTestClass(testClassPath, testClassName);
-	}
+    public TestRunner(String testClassPath, String testClassName)
+            throws MalformedURLException, ClassNotFoundException {
+        loadTestClass(testClassPath, testClassName);
+    }
 
-	private void loadTestClass(String testClassPath, String testClassName)
-		throws MalformedURLException, ClassNotFoundException
-	{
-                File myFile = new File(testClassPath);
-                URL[] urls = { myFile.toURI().toURL() };
-                ClassLoader cl = new URLClassLoader(urls);
-                this.testClass = cl.loadClass(testClassName);
-	}
+    private void loadTestClass(String testClassPath, String testClassName)
+            throws MalformedURLException, ClassNotFoundException {
+        File myFile = new File(testClassPath);
+        URL[] urls = {myFile.toURI().toURL()};
+        ClassLoader cl = new URLClassLoader(urls);
+        this.testClass = cl.loadClass(testClassName);
+    }
 
-	public TreeSet<String> listExercises()
-	{
-		TreeSet<String> exercises = new TreeSet<String>();
+    public TreeSet<String> listExercises() {
+        TreeSet<String> exercises = new TreeSet<String>();
 
-		for (Method m : this.testClass.getMethods())
-		{
-			Test t = m.getAnnotation(Test.class);
-			if (t == null)
-			{
-				continue;
-			}
+        for (Method m : this.testClass.getMethods()) {
+            Test t = m.getAnnotation(Test.class);
+            if (t == null) {
+                continue;
+            }
 
-			Exercise e = m.getAnnotation(Exercise.class);
-			if (e != null)
-			{
-				exercises.add(e.value());
-			}
-		}
-
-		return exercises;
+            Exercise e = m.getAnnotation(Exercise.class);
+            if (e != null) {
+                exercises.add(e.value());
+            }
         }
 
-	public TreeMap<String, ArrayList<TestResult>> runTests()
-		throws InitializationError, NoTestsRemainException
-	{
-		TreeMap<String, ArrayList<TestResult>> result =
-			new TreeMap<String, ArrayList<TestResult>>();
+        return exercises;
+    }
 
-		TreeSet<String> exercises = listExercises();
+    public TreeMap<String, ArrayList<TestResult>> runTests()
+            throws InitializationError, NoTestsRemainException {
+        TreeMap<String, ArrayList<TestResult>> result =
+                new TreeMap<String, ArrayList<TestResult>>();
 
-		BlockJUnit4ClassRunner runner =
-			new BlockJUnit4ClassRunner(this.testClass);
+        TreeSet<String> exercises = listExercises();
 
-		for (String exercise : exercises)
-		{
-			ArrayList<TestResult> exercise_results =
-				new ArrayList<TestResult>();
+        BlockJUnit4ClassRunner runner =
+                new BlockJUnit4ClassRunner(this.testClass);
 
-			RunNotifier notifier = new RunNotifier();
-			SandboxListener listener = new SandboxListener(exercise_results);
-			notifier.addFirstListener(listener);
+        for (String exercise : exercises) {
+            ArrayList<TestResult> exercise_results =
+                    new ArrayList<TestResult>();
 
-			result.put(exercise, exercise_results);
+            RunNotifier notifier = new RunNotifier();
+            SandboxListener listener = new SandboxListener(exercise_results);
+            notifier.addFirstListener(listener);
 
-			ExerciseFilter filter =
-				new ExerciseFilter(exercise);
-			runner.filter(filter);
-			runner.run(notifier);
-		}
+            result.put(exercise, exercise_results);
 
-		return result;
-	}
+            ExerciseFilter filter =
+                    new ExerciseFilter(exercise);
+            runner.filter(filter);
+            runner.run(notifier);
+        }
 
+        return result;
+    }
 }

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package fi.helsinki.cs.tmc.testscanner;
 
 import fi.helsinki.cs.tmc.testrunner.Exercise;
@@ -25,29 +21,29 @@ import org.junit.Test;
 @SupportedSourceVersion(value = SourceVersion.RELEASE_6)
 @SupportedAnnotationTypes(value = {"fi.helsinki.cs.tmc.testrunner.Exercise", "org.junit.Test"})
 class TestMethodAnnotationProcessor extends AbstractProcessor {
-	private ArrayList<TestMethod> testMethods = new ArrayList<TestMethod>();
 
-	@Override
-	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-		for (Element elem : roundEnv.getElementsAnnotatedWith(Test.class)) {
-			if (elem.getKind() == ElementKind.METHOD) {
-				String methodName = elem.getSimpleName().toString();
-				String className = elem.getEnclosingElement().getSimpleName().toString();
-				Exercise exerciseAnnotation = elem.getAnnotation(Exercise.class);
-				String[] exercises;
-				if (exerciseAnnotation != null) {
-					exercises = exerciseAnnotation.value().split(" +");
-				} else {
-					exercises = new String[0];
-				}
-				testMethods.add(new TestMethod(className, methodName, exercises));
-			}
-		}
-		return false;
-	}
+    private ArrayList<TestMethod> testMethods = new ArrayList<TestMethod>();
 
-	public List<TestMethod> getTestMethods() {
-		return Collections.unmodifiableList(testMethods);
-	}
-    
+    @Override
+    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        for (Element elem : roundEnv.getElementsAnnotatedWith(Test.class)) {
+            if (elem.getKind() == ElementKind.METHOD) {
+                String methodName = elem.getSimpleName().toString();
+                String className = elem.getEnclosingElement().getSimpleName().toString();
+                Exercise exerciseAnnotation = elem.getAnnotation(Exercise.class);
+                String[] exercises;
+                if (exerciseAnnotation != null) {
+                    exercises = exerciseAnnotation.value().split(" +");
+                } else {
+                    exercises = new String[0];
+                }
+                testMethods.add(new TestMethod(className, methodName, exercises));
+            }
+        }
+        return false;
+    }
+
+    public List<TestMethod> getTestMethods() {
+        return Collections.unmodifiableList(testMethods);
+    }
 }

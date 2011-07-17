@@ -1,6 +1,5 @@
 package fi.helsinki.cs.tmc.testrunner;
 
-import fi.helsinki.cs.tmc.testrunner.Exercise;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -12,46 +11,44 @@ public class MyStringTest {
     /*
      *  tehtävä 2.1
      */
-
     @Test
     @Exercise("2.1")
     public void merkkijonojenPituusOikein() {
         MyString merkkijono1 = new MyString("koe");
         MyString merkkijono2 = new MyString("pitempi merkkijono");
-        assertEquals("koe".length(), merkkijono1.length() );
-        assertEquals("pitempi merkkijono".length(), merkkijono2.length() );
+        assertEquals("koe".length(), merkkijono1.length());
+        assertEquals("pitempi merkkijono".length(), merkkijono2.length());
     }
 
     @Test
     @Exercise("2.3")
     public void erittainPitkanMerkkijonojenPituusOikein() {
-        String pitkaString = "public void insert(int offset, char c) lisää MyString-merkkijonoon " +
-                "merkin annettuun kohtaan; offset on se indeksi, jonka kohtaan merkki lisätään. " +
-                "Tuolloin siis merkkijonon loppuosaa joudutaan siirtämään yhtä pykälää edemmäksi. " +
-                "Sallitut lisäyskohdat ovat siis 0–pituus ellei mennä mjono-taulukon omasta ylärjasta " +
-                "yli. Virheellinen indeksointi aiheuttaa poikkeuksen, jonka voi heittää vaikkapa " +
-                "lauseella";
+        String pitkaString = "public void insert(int offset, char c) lisää MyString-merkkijonoon "
+                + "merkin annettuun kohtaan; offset on se indeksi, jonka kohtaan merkki lisätään. "
+                + "Tuolloin siis merkkijonon loppuosaa joudutaan siirtämään yhtä pykälää edemmäksi. "
+                + "Sallitut lisäyskohdat ovat siis 0–pituus ellei mennä mjono-taulukon omasta ylärjasta "
+                + "yli. Virheellinen indeksointi aiheuttaa poikkeuksen, jonka voi heittää vaikkapa "
+                + "lauseella";
         MyString merkkijono = new MyString(pitkaString);
 
-        assertEquals(MyString.MAKSIMIPITUUS, merkkijono.length() );
+        assertEquals(MyString.MAKSIMIPITUUS, merkkijono.length());
     }
 
- //   @Test
- //   public void sisainenTaulukkoOikeanKokoinen() throws Exception  {
- //       assertTrue("MyString-luokan sisäiselle taulukolle varattu väärä määrä tilaa",
- //               testaaTaulukonKoko() );
- //   }
+    //   @Test
+    //   public void sisainenTaulukkoOikeanKokoinen() throws Exception  {
+    //       assertTrue("MyString-luokan sisäiselle taulukolle varattu väärä määrä tilaa",
+    //               testaaTaulukonKoko() );
+    //   }
 
     /*
      *  tehtävä 2.2
      */
-
     @Test
     @Exercise("2.4")
     public void konstruktorinKuormitus() {
         MyString merkkijono = new MyString();
 
-        assertEquals( 0, merkkijono.length() );
+        assertEquals(0, merkkijono.length());
     }
 
     @Test
@@ -61,7 +58,7 @@ public class MyStringTest {
         MyString merkkijono = new MyString(mj);
 
         for (int i = 0; i < mj.length(); i++) {
-            assertEquals( mj.charAt(i), merkkijono.charAt(i) );
+            assertEquals(mj.charAt(i), merkkijono.charAt(i));
         }
     }
 
@@ -74,7 +71,7 @@ public class MyStringTest {
             merkkijono.charAt(100);
             fail();
         } catch (IllegalArgumentException e) {
-            assertEquals("charAt-operaatiossa",e.getMessage());
+            assertEquals("charAt-operaatiossa", e.getMessage());
         }
     }
 
@@ -85,7 +82,6 @@ public class MyStringTest {
 
         assertEquals("pitempi merkkijono", merkkijono.toString());
     }
-
 //    @Test
 //    public void uudenMerkinLisaysKeskelle() {
 //        String mj = "koe";
