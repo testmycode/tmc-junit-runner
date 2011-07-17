@@ -40,9 +40,11 @@ public class TestRunner {
                 continue;
             }
 
-            Exercise e = m.getAnnotation(Exercise.class);
-            if (e != null) {
-                exercises.add(e.value());
+            Exercise annotation = m.getAnnotation(Exercise.class);
+            if (annotation != null) {
+                for (String ex : annotation.value().split(" +")) {
+                    exercises.add(ex);
+                }
             }
         }
 
