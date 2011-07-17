@@ -54,7 +54,6 @@ public class SandboxListener extends RunListener {
     public void testStarted(Description description) throws Exception {
         TestResult result = new TestResult(description);
         results.add(result);
-        System.out.println(result);
     }
 
     /**
@@ -66,7 +65,6 @@ public class SandboxListener extends RunListener {
     public void testFinished(Description description) throws Exception {
         TestResult result = getTestResult(description);
         result.testFinished();
-        System.out.println(result);
     }
 
     /**
@@ -78,7 +76,6 @@ public class SandboxListener extends RunListener {
     public void testFailure(Failure failure) throws Exception {
         TestResult result = getTestResult(failure.getDescription());
         result.testFailed(failure);
-        System.out.println(result);
     }
 
     /**

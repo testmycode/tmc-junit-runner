@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.junit.Test;
@@ -16,11 +17,16 @@ import org.junit.runners.model.InitializationError;
 
 public class TestRunner {
 
-    private Class testClass;
+    private Class<?> testClass;
 
     public TestRunner(String testClassPath, String testClassName)
             throws MalformedURLException, ClassNotFoundException {
         loadTestClass(testClassPath, testClassName);
+    }
+    
+    public TestRunner(Class<?> testClass)
+            throws MalformedURLException, ClassNotFoundException {
+        this.testClass = testClass;
     }
 
     private void loadTestClass(String testClassPath, String testClassName)
@@ -42,9 +48,7 @@ public class TestRunner {
 
             Exercise annotation = m.getAnnotation(Exercise.class);
             if (annotation != null) {
-                for (String ex : annotation.value().split(" +")) {
-                    exercises.add(ex);
-                }
+                exercises.addAll(Arrays.asList(annotation.value().split(" +")));
             }
         }
 
