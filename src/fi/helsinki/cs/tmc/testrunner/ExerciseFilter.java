@@ -18,9 +18,14 @@ public class ExerciseFilter extends Filter {
 
     @Override
     public boolean shouldRun(Description description) {
-        Exercise e = description.getAnnotation(Exercise.class);
-        if (e != null && e.value().equals(this.exercise)) {
-            return true;
+        Exercise annotation = description.getAnnotation(Exercise.class);
+        if (annotation != null) {
+            String[] values = annotation.value().split(" +");
+            for (String value : values) {
+                if (value.equals(this.exercise)) {
+                    return true;
+                }
+            }
         }
         return false;
     }
