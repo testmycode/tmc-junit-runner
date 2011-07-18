@@ -24,24 +24,27 @@ public class TestResult
 
 	public void testFinished()
 	{
-		if (this.status != TEST_FAILED)
+		if (this.status != TEST_FAILED) {
 			this.status = TEST_PASSED;
+		}
 	}
 
 	public void testFailed(Failure f)
 	{
 		this.message = f.getException().toString();
 		this.status = TEST_FAILED;
+		//System.out.println(f.getTrace().toString());
 	}
 
 	public String statusToString()
 	{
-		if (this.status == TEST_FAILED)
+		if (this.status == TEST_FAILED) {
 			return "failed";
-		else if (this.status == TEST_PASSED)
+		} else if (this.status == TEST_PASSED) {
 			return "passed";
-		else
+		} else {
 			return "running";
+		}
 	}
 
 	@Override
@@ -49,8 +52,9 @@ public class TestResult
 	{
 		String ret = this.methodName + "(" + this.className + ") " +
 			statusToString();
-		if (!this.message.isEmpty())
+		if (!this.message.isEmpty()) {
 			ret += ": " + this.message;
+		}
 		return ret;
 
 	}

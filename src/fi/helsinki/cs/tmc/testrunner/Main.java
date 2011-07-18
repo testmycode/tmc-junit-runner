@@ -1,26 +1,20 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package fi.helsinki.cs.tmc.testrunner;
 
 import fi.helsinki.cs.tmc.testrunner.runner.TestRunner;
 import fi.helsinki.cs.tmc.testrunner.runner.TestResult;
 import com.google.gson.Gson;
 import fi.helsinki.cs.tmc.testrunner.runner.TMCSecurityManager;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
+import java.security.Policy;
 import java.util.ArrayList;
 import java.util.TreeMap;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runners.model.InitializationError;
 
-/**
- *
- * @author mrannanj
- */
 public class Main {
 
 	private static PrintStream outStream = new PrintStream(System.out);
@@ -34,8 +28,6 @@ public class Main {
                 InitializationError, NoTestsRemainException,
                 FileNotFoundException
 	{
-		System.setSecurityManager(new TMCSecurityManager());
-
 		if (args.length < 3)
 		{
 			usage();
@@ -63,6 +55,7 @@ public class Main {
 		String command = args[0];
 		String classpath = args[1];
 		String classname = args[2];
+		TMCSecurityManager.setupSM(classpath, "testrunner.policy");
 
 		if (command.equals("list")) {
 			listExercises(classpath, classname);
@@ -101,6 +94,9 @@ public class Main {
 		Gson gson = new Gson();
 		TreeMap<String, ArrayList<TestResult>> results =
 			runner.runTests(timeout);
-		resultsStream.println(gson.toJson(results));
+		//resultsStream.println(gson.toJson(results));
+	}
+
+	private Main() {
 	}
 }

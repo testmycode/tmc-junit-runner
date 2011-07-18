@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package fi.helsinki.cs.tmc.testrunner.runner;
 
@@ -12,10 +8,6 @@ import java.util.TreeMap;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runners.model.InitializationError;
 
-/**
- *
- * @author mrannanj
- */
 public class TestRunner {
 
 	private Class testClass;
