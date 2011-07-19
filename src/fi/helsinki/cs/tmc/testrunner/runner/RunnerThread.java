@@ -3,6 +3,7 @@ package fi.helsinki.cs.tmc.testrunner.runner;
 import fi.helsinki.cs.tmc.testrunner.annotation.Exercise;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.junit.Test;
@@ -14,7 +15,7 @@ import org.junit.runners.model.InitializationError;
 public class RunnerThread extends Thread {
 
     private Class testClass;
-    private ArrayList<String> exercises;
+    private TreeSet<String> exercises;
     private TreeMap<String, ArrayList<TestResult>> results;
 
     public RunnerThread(Class testClass,
@@ -23,8 +24,7 @@ public class RunnerThread extends Thread {
         this.results = results;
     }
 
-    private ArrayList<String> listExercises()
-{
+    private TreeSet<String> listExercises() {
         TreeSet<String> exerciseSet = new TreeSet<String>();
 
         for (Method m : this.testClass.getMethods()) {
@@ -33,13 +33,13 @@ public class RunnerThread extends Thread {
                 continue;
             }
 
-            Exercise e = m.getAnnotation(Exercise.class);
-            if (e != null) {
-                exerciseSet.add(e.value());
+            Exercise annotation = m.getAnnotation(Exercise.class);
+            if (annotation != null) {
+                exerciseSet.addAll(Arrays.asList(annotation.value().split(" +")));
             }
         }
 
-        return new ArrayList<String>(exerciseSet);
+        return exerciseSet;
     }
 
     @Override
