@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class ClassLoaderTest {
+public class TMCClassLoaderTest {
 
     @Test
     public void testLoadClass() throws Exception {
