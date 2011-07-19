@@ -4,10 +4,6 @@ import fi.helsinki.cs.tmc.testrunner.annotation.Exercise;
 import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 
-/**
- *
- * @author mrannanj
- */
 public class ExerciseFilter extends Filter {
 
     private String exercise;
@@ -23,9 +19,14 @@ public class ExerciseFilter extends Filter {
 
     @Override
     public boolean shouldRun(Description description) {
-        Exercise e = description.getAnnotation(Exercise.class);
-        if (e != null && e.value().equals(this.exercise)) {
-            return true;
+        Exercise annotation = description.getAnnotation(Exercise.class);
+        if (annotation != null) {
+            String[] values = annotation.value().split(" +");
+            for (String value : values) {
+                if (value.equals(this.exercise)) {
+                    return true;
+                }
+            }
         }
         return false;
     }
