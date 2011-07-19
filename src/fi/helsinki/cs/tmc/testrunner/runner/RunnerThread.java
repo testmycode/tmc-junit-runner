@@ -13,71 +13,65 @@ import org.junit.runners.model.InitializationError;
 
 public class RunnerThread extends Thread {
 
-	private Class testClass;
-	private ArrayList<String> exercises;
-	private TreeMap<String, ArrayList<TestResult>> results;
+    private Class testClass;
+    private ArrayList<String> exercises;
+    private TreeMap<String, ArrayList<TestResult>> results;
 
-	public RunnerThread(Class testClass,
-		TreeMap<String, ArrayList<TestResult>> results)
-	{
-		this.testClass = testClass;
-		this.results = results;
-	}
+    public RunnerThread(Class testClass,
+            TreeMap<String, ArrayList<TestResult>> results) {
+        this.testClass = testClass;
+        this.results = results;
+    }
 
-	private ArrayList<String> listExercises()
-	{
-		TreeSet<String> exerciseSet = new TreeSet<String>();
+    private ArrayList<String> listExercises()
+{
+        TreeSet<String> exerciseSet = new TreeSet<String>();
 
-		for (Method m : this.testClass.getMethods())
-		{
-			Test t = m.getAnnotation(Test.class);
-			if (t == null)
-			{
-				continue;
-			}
+        for (Method m : this.testClass.getMethods()) {
+            Test t = m.getAnnotation(Test.class);
+            if (t == null) {
+                continue;
+            }
 
-			Exercise e = m.getAnnotation(Exercise.class);
-			if (e != null)
-			{
-				exerciseSet.add(e.value());
-			}
-		}
-
-		return new ArrayList<String>(exerciseSet);
+            Exercise e = m.getAnnotation(Exercise.class);
+            if (e != null) {
+                exerciseSet.add(e.value());
+            }
         }
 
-	@Override
-	public void run() {
+        return new ArrayList<String>(exerciseSet);
+    }
 
-		this.exercises = listExercises();
-		try {
-			runTests();
-		} catch (InitializationError ex) {
+    @Override
+    public void run() {
+        this.exercises = listExercises();
+        try {
+            runTests();
+        } catch (InitializationError ex) {
 
-		} catch (NoTestsRemainException ex) {
-		}
+        } catch (NoTestsRemainException ex) {
+        }
 
-	}
+    }
 
-	private void runTests() throws InitializationError, NoTestsRemainException {
-		BlockJUnit4ClassRunner runner =
-			new BlockJUnit4ClassRunner(this.testClass);
+    private void runTests() throws InitializationError, NoTestsRemainException {
+        BlockJUnit4ClassRunner runner =
+                new BlockJUnit4ClassRunner(this.testClass);
 
-		for (String exercise : exercises)
-		{
-			ArrayList<TestResult> exercise_results =
-				new ArrayList<TestResult>();
+        for (String exercise : exercises) {
+            ArrayList<TestResult> exercise_results =
+                    new ArrayList<TestResult>();
 
-			RunNotifier notifier = new RunNotifier();
-			TestListener listener = new TestListener(exercise_results);
-			notifier.addFirstListener(listener);
+            RunNotifier notifier = new RunNotifier();
+            TestListener listener = new TestListener(exercise_results);
+            notifier.addFirstListener(listener);
 
-			results.put(exercise, exercise_results);
+            results.put(exercise, exercise_results);
 
-			ExerciseFilter filter =
-				new ExerciseFilter(exercise);
-			runner.filter(filter);
-			runner.run(notifier);
-		}
-	}
+            ExerciseFilter filter =
+                    new ExerciseFilter(exercise);
+            runner.filter(filter);
+            runner.run(notifier);
+        }
+    }
 }

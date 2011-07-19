@@ -7,16 +7,14 @@ import java.net.URLClassLoader;
 
 public class TMCClassLoader extends URLClassLoader {
 
-	public TMCClassLoader(URL[] urls)
-	{
-		super(urls);
-	}
+    public TMCClassLoader(URL[] urls) {
+        super(urls);
+    }
 
-	public static TMCClassLoader fromPath(String classPath)
-		throws MalformedURLException
-	{
-                File myFile = new File(classPath);
-                URL[] urls = { myFile.toURI().toURL() };
-                return new TMCClassLoader(urls);
-	}
+    public static TMCClassLoader fromPath(String classPath)
+            throws MalformedURLException {
+        File myFile = new File(classPath);
+        URL[] urls = { myFile.toURI().toURL() };
+        return new TMCClassLoader(urls);
+    }
 }
