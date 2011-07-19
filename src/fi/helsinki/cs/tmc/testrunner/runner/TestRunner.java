@@ -1,7 +1,6 @@
 
 package fi.helsinki.cs.tmc.testrunner.runner;
 
-import fi.helsinki.cs.tmc.testrunner.util.TMCClassLoader;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.TreeMap;

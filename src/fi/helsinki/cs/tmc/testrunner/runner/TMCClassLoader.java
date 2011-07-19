@@ -1,4 +1,4 @@
-package fi.helsinki.cs.tmc.testrunner.util;
+package fi.helsinki.cs.tmc.testrunner.runner;
 
 import java.io.File;
 import java.net.MalformedURLException;

@@ -1,7 +1,7 @@
 
-package fi.helsinki.cs.tmc.testrunner;
+package fi.helsinki.cs.tmc.testrunner.runner;
 
-import fi.helsinki.cs.tmc.testrunner.util.TMCClassLoader;
+import fi.helsinki.cs.tmc.testrunner.runner.TMCClassLoader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import org.junit.Test;
