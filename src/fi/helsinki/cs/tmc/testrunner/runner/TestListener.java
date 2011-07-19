@@ -8,7 +8,7 @@ import org.junit.runner.notification.RunListener;
 
 public class TestListener extends RunListener {
 
-    ArrayList<TestResult> results;
+    private ArrayList<TestResult> results;
 
     public TestListener(ArrayList<TestResult> results) {
         this.results = results;
@@ -49,7 +49,6 @@ public class TestListener extends RunListener {
     public void testStarted(Description description) throws Exception {
         TestResult result = new TestResult(description);
         results.add(result);
-        System.out.println(result);
     }
 
     /**
@@ -61,7 +60,6 @@ public class TestListener extends RunListener {
     public void testFinished(Description description) throws Exception {
         TestResult result = getTestResult(description);
         result.testFinished();
-        System.out.println(result);
     }
 
     /**
@@ -73,7 +71,6 @@ public class TestListener extends RunListener {
     public void testFailure(Failure failure) throws Exception {
         TestResult result = getTestResult(failure.getDescription());
         result.testFailed(failure);
-        System.out.println(result);
     }
 
     /**
