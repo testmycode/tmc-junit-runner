@@ -1,9 +1,6 @@
 package fi.helsinki.cs.tmc.testrunner;
 
-import fi.helsinki.cs.tmc.testrunner.runner.TestRunner;
-import fi.helsinki.cs.tmc.testrunner.runner.TestResult;
 import com.google.gson.Gson;
-import fi.helsinki.cs.tmc.testrunner.runner.TMCSecurityManager;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;

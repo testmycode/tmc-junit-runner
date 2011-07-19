@@ -1,7 +1,7 @@
 
-package fi.helsinki.cs.tmc.testrunner.runner;
+package fi.helsinki.cs.tmc.testrunner;
 
-import fi.helsinki.cs.tmc.testrunner.runner.TMCClassLoader;
+import fi.helsinki.cs.tmc.testrunner.TMCClassLoader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import org.junit.Test;
@@ -13,7 +13,7 @@ public class ClassLoaderTest {
     public void testLoadClass() throws Exception {
         String classPath = "build/test/classes";
         String className =
-                "fi.helsinki.cs.tmc.testrunner.runner.TestRunnerTestSubject";
+                "fi.helsinki.cs.tmc.testrunner.TestRunnerTestSubject";
         TMCClassLoader cl = TMCClassLoader.fromPath(classPath);
         Class result = cl.loadClass(className);
         assertNotNull(result);

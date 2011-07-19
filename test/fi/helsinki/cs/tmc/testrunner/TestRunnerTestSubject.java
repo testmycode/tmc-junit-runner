@@ -1,9 +1,8 @@
 
-package fi.helsinki.cs.tmc.testrunner.runner;
+package fi.helsinki.cs.tmc.testrunner;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import fi.helsinki.cs.tmc.testrunner.annotation.Exercise;
 import static org.junit.Assert.*;
 
 @Ignore

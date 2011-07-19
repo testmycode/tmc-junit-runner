@@ -1,6 +1,6 @@
 package fi.helsinki.cs.tmc.testscanner;
 
-import fi.helsinki.cs.tmc.testrunner.annotation.Exercise;
+import fi.helsinki.cs.tmc.testrunner.Exercise;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

@@ -1,6 +1,5 @@
-package fi.helsinki.cs.tmc.testrunner.runner;
+package fi.helsinki.cs.tmc.testrunner;
 
-import fi.helsinki.cs.tmc.testrunner.annotation.Exercise;
 import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 

@@ -1,4 +1,4 @@
-package fi.helsinki.cs.tmc.testrunner.annotation;
+package fi.helsinki.cs.tmc.testrunner;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

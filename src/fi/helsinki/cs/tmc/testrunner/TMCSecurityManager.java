@@ -1,4 +1,4 @@
-package fi.helsinki.cs.tmc.testrunner.runner;
+package fi.helsinki.cs.tmc.testrunner;
 
 import java.io.File;
 import java.security.Permission;

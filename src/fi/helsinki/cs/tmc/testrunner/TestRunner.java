@@ -1,5 +1,5 @@
 
-package fi.helsinki.cs.tmc.testrunner.runner;
+package fi.helsinki.cs.tmc.testrunner;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;

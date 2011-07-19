@@ -1,4 +1,4 @@
-package fi.helsinki.cs.tmc.testrunner.runner;
+package fi.helsinki.cs.tmc.testrunner;
 
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
