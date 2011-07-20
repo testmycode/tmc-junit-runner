@@ -32,7 +32,18 @@ public class TestRunner {
         } catch (InterruptedException ignore) {}
 
         synchronized(this.testCases) {
+            timeoutRunningTestCase();
         	return testCasesToMap();
+        }
+    }
+
+    private void timeoutRunningTestCase() {
+        for (TestCase t : this.testCases) {
+            if (t.status == TestCase.TEST_RUNNING) {
+                t.status = TestCase.TEST_FAILED;
+                t.message = "timeout";
+                return;
+            }
         }
     }
 

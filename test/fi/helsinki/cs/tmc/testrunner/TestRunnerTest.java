@@ -22,4 +22,19 @@ public class TestRunnerTest {
         assertEquals("successfulTestCaseForTwo", results.get("two").get(1).methodName);
         assertEquals(TestCase.TEST_FAILED, results.get("two").get(1).status);
     }
+
+    @Test
+    public void shouldTimeout() throws Exception {
+        TestRunner runner = new TestRunner(TimeoutTestSubject.class);
+        TreeMap<String, ArrayList<TestCase>> results = runner.runTests(1000);
+
+        assertTrue(results.containsKey("one"));
+        assertTrue(results.containsKey("two"));
+
+        TestCase infiniteCase = results.get("two").get(0);
+
+        assertEquals("infiniteTwo", infiniteCase.methodName);
+        assertEquals(TestCase.TEST_FAILED, infiniteCase.status);
+        assertTrue(infiniteCase.message.contains("timeout"));
+    }
 }
