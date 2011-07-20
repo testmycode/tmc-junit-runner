@@ -8,13 +8,13 @@ import org.junit.runner.notification.RunListener;
 
 public class TestListener extends RunListener {
 
-    private ArrayList<TestCase> testCases;
+    private final ArrayList<TestCase> testCases;
 
     public TestListener(ArrayList<TestCase> testCases) {
         this.testCases = testCases;
     }
 
-    private TestCase getTestResult(Description desc) throws Exception {
+    private TestCase getTestCase(Description desc) throws Exception {
         for (TestCase r : this.testCases) {
             if (!r.methodName.equals(desc.getMethodName())) {
                 continue;
@@ -52,7 +52,9 @@ public class TestListener extends RunListener {
      */
     @Override
     public void testStarted(Description desc) throws Exception {
-        getTestResult(desc).testStarted();
+        synchronized (this.testCases) {
+            getTestCase(desc).testStarted();
+        }
     }
 
     /**
@@ -63,7 +65,9 @@ public class TestListener extends RunListener {
      */
     @Override
     public void testFinished(Description description) throws Exception {
-        getTestResult(description).testFinished();
+        synchronized (this.testCases) {
+        	getTestCase(description).testFinished();
+        }
     }
 
     /**
@@ -74,7 +78,9 @@ public class TestListener extends RunListener {
      */
     @Override
     public void testFailure(Failure failure) throws Exception {
-        getTestResult(failure.getDescription()).testFailed(failure);
+        synchronized (this.testCases) {
+        	getTestCase(failure.getDescription()).testFailed(failure);
+        }
     }
 
     /**
@@ -85,5 +91,4 @@ public class TestListener extends RunListener {
      */
     @Override
     public void testIgnored(Description description) throws Exception {}
-
 }

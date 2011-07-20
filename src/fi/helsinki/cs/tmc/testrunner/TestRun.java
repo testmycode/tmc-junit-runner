@@ -2,7 +2,6 @@
 package fi.helsinki.cs.tmc.testrunner;
 
 import java.util.ArrayList;
-import java.util.TreeMap;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;

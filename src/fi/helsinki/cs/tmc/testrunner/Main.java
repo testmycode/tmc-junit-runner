@@ -9,7 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.List;
 import java.util.TreeMap;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runners.model.InitializationError;
@@ -128,7 +128,7 @@ public class Main {
             ClassNotFoundException {
         loadTestClass();
         TestRunner runner = new TestRunner(Main.testClass);
-        ArrayList<TestCase> testCases = runner.getTestCases();
+        List<TestCase> testCases = runner.getTestCases();
         resultsStream.println(testCases);
     }
 
