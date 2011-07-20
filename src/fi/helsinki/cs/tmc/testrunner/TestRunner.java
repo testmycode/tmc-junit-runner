@@ -1,41 +1,52 @@
 
 package fi.helsinki.cs.tmc.testrunner;
 
-import java.net.MalformedURLException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.TreeMap;
-import org.junit.runner.manipulation.NoTestsRemainException;
-import org.junit.runners.model.InitializationError;
+import java.util.TreeSet;
+import org.junit.Test;
 
 public class TestRunner {
 
     private Class testClass;
-    private ClassLoader classLoader;
-
-    public TestRunner(String testClassPath, String testClassName)
-            throws MalformedURLException, ClassNotFoundException {
-        this.classLoader = TMCClassLoader.fromPath(testClassPath);
-        this.testClass = this.classLoader.loadClass(testClassName);
-    }
+    private TreeSet<String> exercises = new TreeSet<String>();
 
     public TestRunner(Class testClass) {
         this.testClass = testClass;
+        listExercises();
     }
 
-    public TreeMap<String, ArrayList<TestResult>> runTests(long timeout)
-            throws InitializationError, NoTestsRemainException {
-        TreeMap<String, ArrayList<TestResult>> result =
+    public TreeSet<String> getExercises() {
+        return this.exercises;
+    }
+
+    public TreeMap<String, ArrayList<TestResult>> runTests(long timeout) {
+        TreeMap<String, ArrayList<TestResult>> results =
                 new TreeMap<String, ArrayList<TestResult>>();
+        TestRun testRun = new TestRun(this.testClass, exercises, results);
 
-        RunnerThread runnerThread =
-                new RunnerThread(this.testClass, result);
-
+        Thread runnerThread = new Thread(testRun);
         runnerThread.start();
         try {
             runnerThread.join(timeout);
         } catch (InterruptedException ignore) {}
 
-        return result;
+        return results;
     }
 
+    private void listExercises() {
+        for (Method m : this.testClass.getMethods()) {
+            Test t = m.getAnnotation(Test.class);
+            if (t == null) {
+                continue;
+            }
+
+            Exercise annotation = m.getAnnotation(Exercise.class);
+            if (annotation != null) {
+                exercises.addAll(Arrays.asList(annotation.value().split(" +")));
+            }
+        }
+    }
 }
