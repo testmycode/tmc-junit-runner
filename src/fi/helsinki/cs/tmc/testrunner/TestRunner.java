@@ -3,29 +3,25 @@ package fi.helsinki.cs.tmc.testrunner;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import org.junit.Test;
 
 public class TestRunner {
 
     private Class testClass;
-    private TreeSet<String> exercises = new TreeSet<String>();
+    private ArrayList<TestCase> testCases = new ArrayList<TestCase>();
 
     public TestRunner(Class testClass) {
         this.testClass = testClass;
-        listExercises();
+        listTestCases();
     }
 
-    public TreeSet<String> getExercises() {
-        return this.exercises;
+    public ArrayList<TestCase> getTestCases() {
+        return this.testCases;
     }
 
-    public TreeMap<String, ArrayList<TestResult>> runTests(long timeout) {
-        TreeMap<String, ArrayList<TestResult>> results =
-                new TreeMap<String, ArrayList<TestResult>>();
-        TestRun testRun = new TestRun(this.testClass, exercises, results);
+    public TreeMap<String, ArrayList<TestCase>> runTests(long timeout) {
+        TestRun testRun = new TestRun(this.testClass, this.testCases);
 
         Thread runnerThread = new Thread(testRun);
         runnerThread.start();
@@ -33,20 +29,33 @@ public class TestRunner {
             runnerThread.join(timeout);
         } catch (InterruptedException ignore) {}
 
+        TreeMap<String, ArrayList<TestCase>> results =
+                new TreeMap<String, ArrayList<TestCase>>();
+
+        for (TestCase testCase : this.testCases) {
+            for (String pointName : testCase.pointNames) {
+                ArrayList<TestCase> pointCases = results.get(pointName);
+                if (pointCases == null) {
+                	pointCases = new ArrayList<TestCase>();
+                    results.put(pointName, pointCases);
+                }
+                pointCases.add(testCase);
+            }
+        }
+
         return results;
     }
 
-    private void listExercises() {
+    private void listTestCases() {
         for (Method m : this.testClass.getMethods()) {
             Test t = m.getAnnotation(Test.class);
-            if (t == null) {
+            Exercise annotation = m.getAnnotation(Exercise.class);
+            if (t == null || annotation == null) {
                 continue;
             }
-
-            Exercise annotation = m.getAnnotation(Exercise.class);
-            if (annotation != null) {
-                exercises.addAll(Arrays.asList(annotation.value().split(" +")));
-            }
+            TestCase testCase = new TestCase(m.getName(),
+                    this.testClass.getName(), annotation.value().split(" +"));
+            this.testCases.add(testCase);
         }
     }
 }

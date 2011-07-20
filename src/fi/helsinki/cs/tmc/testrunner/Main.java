@@ -9,8 +9,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runners.model.InitializationError;
 
@@ -119,7 +119,7 @@ public class Main {
         loadTestClass();
         TestRunner runner = new TestRunner(Main.testClass);
         Gson gson = new Gson();
-        TreeMap<String, ArrayList<TestResult>> results =
+        TreeMap<String, ArrayList<TestCase>> results =
                 runner.runTests(Main.timeout);
         resultsStream.println(gson.toJson(results));
     }
@@ -128,9 +128,8 @@ public class Main {
             ClassNotFoundException {
         loadTestClass();
         TestRunner runner = new TestRunner(Main.testClass);
-        TreeSet<String> exercises = runner.getExercises();
-        Gson gson = new Gson();
-        resultsStream.println(gson.toJson(exercises));
+        ArrayList<TestCase> testCases = runner.getTestCases();
+        resultsStream.println(testCases);
     }
 
     private static void usage() {

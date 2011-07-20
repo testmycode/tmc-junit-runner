@@ -1,22 +1,28 @@
 package fi.helsinki.cs.tmc.testrunner;
 
-import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 
-public class TestResult {
+public class TestCase {
+    public String[] pointNames;
     public String methodName;
     public String className;
     public String message;
     public int status;
 
-    static final int TEST_FAILED = 0;
+    static final int TEST_NOT_STARTED = 0;
     static final int TEST_PASSED = 1;
-    static final int TEST_RUNNING = 2;
+    static final int TEST_FAILED = 2;
+    static final int TEST_RUNNING = 3;
 
-    public TestResult(Description description) {
-        this.methodName = description.getMethodName();
-        this.className = description.getClassName();
-        this.message = "";
+    public TestCase(String methodName, String className, String[] pointNames) {
+        this.methodName = methodName;
+        this.className = className;
+        this.status = TEST_NOT_STARTED;
+        this.pointNames = pointNames;
+        this.message = null;
+    }
+
+    public void testStarted() {
         this.status = TEST_RUNNING;
     }
 
@@ -32,12 +38,13 @@ public class TestResult {
     }
 
     public String statusToString() {
-        if (this.status == TEST_FAILED) {
-            return "failed";
-        } else if (this.status == TEST_PASSED) {
-            return "passed";
-        } else {
-            return "running";
+        switch (this.status)
+        {
+            case TEST_FAILED: return "failed";
+            case TEST_PASSED: return "passed";
+            case TEST_RUNNING: return "running";
+            case TEST_NOT_STARTED: return "not started";
+            default: return "unknown and probably illegal :(";
         }
     }
 
@@ -45,10 +52,9 @@ public class TestResult {
     public String toString() {
         String ret = this.methodName + "(" + this.className + ") " +
                 statusToString();
-        if (!this.message.isEmpty()) {
+        if (this.message != null) {
             ret += ": " + this.message;
         }
         return ret;
-
     }
 }
