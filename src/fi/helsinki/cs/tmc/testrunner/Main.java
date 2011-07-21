@@ -9,7 +9,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.TreeMap;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runners.model.InitializationError;
@@ -117,19 +116,15 @@ public class Main {
             NoTestsRemainException {
         TMCSecurityManager.setupSM(Main.classPath, "testrunner.policy");
         loadTestClass();
-        TestRunner runner = new TestRunner(Main.testClass);
+        TestRunner testCases = new TestRunner(Main.testClass);
         Gson gson = new Gson();
-        TreeMap<String, ArrayList<TestCase>> results =
-                runner.runTests(Main.timeout);
+        testCases.runTests(Main.timeout);
+        ArrayList<TestCase> results = testCases.getTestCases();
         resultsStream.println(gson.toJson(results));
     }
 
-    private static void listExercises() throws MalformedURLException,
-            ClassNotFoundException {
-        loadTestClass();
-        TestRunner runner = new TestRunner(Main.testClass);
-        List<TestCase> testCases = runner.getTestCases();
-        resultsStream.println(testCases);
+    private static void listExercises() {
+        System.out.println("exercise listing deprecated");
     }
 
     private static void usage() {

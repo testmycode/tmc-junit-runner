@@ -22,6 +22,14 @@ public class TestCase {
         this.message = null;
     }
 
+    public TestCase(TestCase aTestCase) {
+        this.methodName = aTestCase.methodName;
+        this.className = aTestCase.className;
+        this.message = aTestCase.message;
+        this.status = aTestCase.status;
+        this.pointNames = aTestCase.pointNames.clone();
+    }
+
     public void testStarted() {
         this.status = TEST_RUNNING;
     }
@@ -44,7 +52,7 @@ public class TestCase {
             case TEST_PASSED: return "passed";
             case TEST_RUNNING: return "running";
             case TEST_NOT_STARTED: return "not started";
-            default: return "unknown and probably illegal :(";
+            default: return "illegal";
         }
     }
 

@@ -6,12 +6,8 @@ import org.junit.Test;
 @Ignore
 public class TimeoutTestSubject {
     @Test
-    @Exercise("one")
-    public void succesfulOne() {}
-
-    @Test
-    @Exercise("two")
-    public void infiniteTwo() {
+    @Exercise("infinite")
+    public void infinite() {
         for (;;) {}
     }
 }

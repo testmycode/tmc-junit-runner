@@ -1,6 +1,5 @@
 package fi.helsinki.cs.tmc.testrunner;
 
-import java.util.ArrayList;
 import org.junit.runner.Description;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
@@ -8,23 +7,12 @@ import org.junit.runner.notification.RunListener;
 
 public class TestListener extends RunListener {
 
-    private final ArrayList<TestCase> testCases;
+    private final TestCase testCase;
+    private final Object lock;
 
-    public TestListener(ArrayList<TestCase> testCases) {
-        this.testCases = testCases;
-    }
-
-    private TestCase getTestCase(Description desc) throws Exception {
-        for (TestCase r : this.testCases) {
-            if (!r.methodName.equals(desc.getMethodName())) {
-                continue;
-            }
-            if (!r.className.equals(desc.getClassName())) {
-                continue;
-            }
-            return r;
-        }
-        throw new Exception("TestCase not found.");
+    public TestListener(TestCase testCase, Object lock) {
+        this.testCase = testCase;
+        this.lock = lock;
     }
 
     /**
@@ -52,8 +40,8 @@ public class TestListener extends RunListener {
      */
     @Override
     public void testStarted(Description desc) throws Exception {
-        synchronized (this.testCases) {
-            getTestCase(desc).testStarted();
+        synchronized (this.lock) {
+            this.testCase.testStarted();
         }
     }
 
@@ -65,8 +53,8 @@ public class TestListener extends RunListener {
      */
     @Override
     public void testFinished(Description description) throws Exception {
-        synchronized (this.testCases) {
-        	getTestCase(description).testFinished();
+        synchronized (this.lock) {
+        	this.testCase.testFinished();
         }
     }
 
@@ -78,8 +66,8 @@ public class TestListener extends RunListener {
      */
     @Override
     public void testFailure(Failure failure) throws Exception {
-        synchronized (this.testCases) {
-        	getTestCase(failure.getDescription()).testFailed(failure);
+        synchronized (this.lock) {
+            this.testCase.testFailed(failure);
         }
     }
 
