@@ -11,10 +11,11 @@ public class TestRunnerTestSubject {
     @Exercise("one two three")
     public void successfulTestCaseForOneTwoThree() {
     }
-    
+
     @Test
     @Exercise("two")
     public void successfulTestCaseForTwo() {
         fail("too bad");
     }
 }
+

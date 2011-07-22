@@ -1,86 +1,92 @@
 package fi.helsinki.cs.tmc.testrunner;
 
-import java.io.File;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import org.junit.Test;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 
-public class TestRunner {
+public class TestRunner implements Runnable {
 
-    private Class<?> testClass;
+    private TestCases testCases = new TestCases();
+    private final Object lock = new Object();
+    private boolean stop;
+    private int currentCase;
+    private Class testClass;
 
-    public TestRunner(String testClassPath, String testClassName)
-            throws MalformedURLException, ClassNotFoundException {
-        loadTestClass(testClassPath, testClassName);
-    }
-    
-    public TestRunner(Class<?> testClass)
-            throws MalformedURLException, ClassNotFoundException {
+    public TestRunner(Class testClass) {
         this.testClass = testClass;
+        this.currentCase = -1;
+        this.stop = false;
+        createTestCases(testClass);
     }
 
-    private void loadTestClass(String testClassPath, String testClassName)
-            throws MalformedURLException, ClassNotFoundException {
-        File myFile = new File(testClassPath);
-        URL[] urls = {myFile.toURI().toURL()};
-        ClassLoader cl = new URLClassLoader(urls);
-        this.testClass = cl.loadClass(testClassName);
+    public TestCase getCurrentCase() {
+        return this.testCases.get(this.currentCase);
     }
 
-    public TreeSet<String> listExercises() {
-        TreeSet<String> exercises = new TreeSet<String>();
+    public TestCases runTests(long timeout) {
+        Thread runnerThread = new Thread(this);
 
-        for (Method m : this.testClass.getMethods()) {
+        runnerThread.start();
+        try {
+            runnerThread.join(timeout);
+        } catch (InterruptedException ignore) {}
+
+        synchronized(this.lock) {
+            this.stop = true;
+            timeoutRunningTestCase();
+            return this.testCases.clone();
+        }
+    }
+
+    public void run() {
+        try {
+            BlockJUnit4ClassRunner runner =
+                    new BlockJUnit4ClassRunner(this.testClass);
+            for (this.currentCase = 0;
+                this.currentCase < this.testCases.size();
+                this.currentCase++) {
+                TestCase testCase = getCurrentCase();
+                RunNotifier notifier = new RunNotifier();
+                notifier.addFirstListener(new TestListener(testCase, lock));
+                runner.filter(new MethodFilter(testCase.methodName));
+                runner.run(notifier);
+
+                if (this.stop) {
+                    break;
+                }
+            }
+        } catch (NoTestsRemainException ex) {
+        } catch (InitializationError ex) {
+        }
+    }
+
+    private void createTestCases(Class testClass) {
+        for (Method m : testClass.getMethods()) {
             Test t = m.getAnnotation(Test.class);
-            if (t == null) {
+            Exercise annotation = m.getAnnotation(Exercise.class);
+            if (t == null || annotation == null) {
                 continue;
             }
-
-            Exercise annotation = m.getAnnotation(Exercise.class);
-            if (annotation != null) {
-                exercises.addAll(Arrays.asList(annotation.value().split(" +")));
-            }
+            TestCase testCase = new TestCase(m.getName(), testClass.getName(),
+                    annotation.value().split(" +"));
+            this.testCases.add(testCase);
         }
-
-        return exercises;
     }
 
-    public TreeMap<String, ArrayList<TestResult>> runTests()
-            throws InitializationError, NoTestsRemainException {
-        TreeMap<String, ArrayList<TestResult>> result =
-                new TreeMap<String, ArrayList<TestResult>>();
-
-        TreeSet<String> exercises = listExercises();
-
-        BlockJUnit4ClassRunner runner =
-                new BlockJUnit4ClassRunner(this.testClass);
-
-        for (String exercise : exercises) {
-            ArrayList<TestResult> exercise_results =
-                    new ArrayList<TestResult>();
-
-            RunNotifier notifier = new RunNotifier();
-            SandboxListener listener = new SandboxListener(exercise_results);
-            notifier.addFirstListener(listener);
-
-            result.put(exercise, exercise_results);
-
-            ExerciseFilter filter =
-                    new ExerciseFilter(exercise);
-            runner.filter(filter);
-            runner.run(notifier);
+    private void timeoutRunningTestCase() {
+        if (this.currentCase < 0 ||
+            this.currentCase >= this.testCases.size()) {
+            return;
         }
 
-        return result;
+        TestCase t = getCurrentCase();
+        if (t.status == TestCase.TEST_RUNNING) {
+            t.status = TestCase.TEST_FAILED;
+            t.message = "timeout";
+        }
     }
 }
+
