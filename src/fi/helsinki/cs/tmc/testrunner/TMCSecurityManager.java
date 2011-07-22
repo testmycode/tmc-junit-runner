@@ -9,12 +9,21 @@ public class TMCSecurityManager extends SecurityManager
 {
     private ArrayList<String> classPaths = new ArrayList<String>();
 
-    public static void setupSM(String classPath, String policyFilePath) {
+    public static void setupSecurityManager(String classPath,
+            String policyFilePath) {
+        if (policyFilePath == null) {
+            throw new SecurityException("security policy file path unspecified");
+        }
+
         String testClassPath = new File(classPath).getAbsolutePath();
-        System.setProperty("java.security.policy", policyFilePath);
         System.setProperty("testclasspath", testClassPath);
+        System.setProperty("java.security.policy", policyFilePath);
         Policy.getPolicy().refresh();
         System.setSecurityManager(new TMCSecurityManager());
+    }
+
+    public static void disable() {
+        System.setSecurityManager(null);
     }
 
     public TMCSecurityManager() {

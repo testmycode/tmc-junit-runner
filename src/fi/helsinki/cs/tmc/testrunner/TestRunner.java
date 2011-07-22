@@ -2,7 +2,6 @@
 package fi.helsinki.cs.tmc.testrunner;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import org.junit.Test;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runner.notification.RunNotifier;
@@ -22,10 +21,6 @@ public class TestRunner implements Runnable {
         this.currentCase = -1;
         this.stop = false;
         createTestCases(testClass);
-    }
-
-    public ArrayList<TestCase> getTestCases() {
-        return this.testCases.clone();
     }
 
     public TestCase getCurrentCase() {

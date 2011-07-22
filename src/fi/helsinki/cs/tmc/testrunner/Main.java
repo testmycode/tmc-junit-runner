@@ -9,20 +9,19 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.TreeMap;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runners.model.InitializationError;
 
 public class Main {
 
     private static final int ACTION_USAGE = 0;
-    private static final int ACTION_LIST = 1;
-    private static final int ACTION_RUN = 2;
+    private static final int ACTION_RUNTESTS = 1;
 
     private static PrintStream outStream = System.out;
     private static PrintStream resultsStream = System.out;
     private static String outFilename = null;
     private static String resultsFilename = null;
+    private static String policyFilename = null;
     private static long timeout = 60*1000;
 
     private static int action = ACTION_USAGE;
@@ -41,11 +40,7 @@ public class Main {
         redirectOutput();
 
         switch (Main.action) {
-            case ACTION_LIST:
-            	listExercises();
-                break;
-
-            case ACTION_RUN:
+            case ACTION_RUNTESTS:
             	runExercises();
                 break;
 
@@ -69,34 +64,31 @@ public class Main {
     }
 
     private static void parseArguments(String args[]) {
-        if (args.length < 3) {
+        if (args.length < 2) {
             Main.action = ACTION_USAGE;
             return;
         }
 
-        if (args[0].equals("list")) {
-            Main.action = ACTION_LIST;
-        } else if (args[0].equals("run")) {
-            Main.action = ACTION_RUN;
-        } else {
-            Main.action = ACTION_USAGE;
-        }
+        Main.action = ACTION_RUNTESTS;
+        Main.classPath = args[0];
+        Main.className = args[1];
 
-        Main.classPath = args[1];
-        Main.className = args[2];
-
-        if (args.length >= 4) {
+        if (args.length >= 3) {
             try {
-                Main.timeout = Integer.parseInt(args[3]) * 1000;
+                Main.timeout = Integer.parseInt(args[2]) * 1000;
             } catch (NumberFormatException e) {}
         }
 
+        if (args.length >= 4) {
+            Main.resultsFilename = args[3];
+        }
+
         if (args.length >= 5) {
-            Main.resultsFilename = args[4];
+            Main.outFilename = args[4];
         }
 
         if (args.length >= 6) {
-            Main.outFilename = args[5];
+            Main.policyFilename = args[5];
         }
     }
 
@@ -114,22 +106,18 @@ public class Main {
     private static void runExercises() throws MalformedURLException,
             ClassNotFoundException, InitializationError,
             NoTestsRemainException {
-        TMCSecurityManager.setupSM(Main.classPath, "testrunner.policy");
+        TMCSecurityManager.setupSecurityManager(Main.classPath,
+                Main.policyFilename);
         loadTestClass();
         TestRunner testCases = new TestRunner(Main.testClass);
-        Gson gson = new Gson();
-        testCases.runTests(Main.timeout);
-        ArrayList<TestCase> results = testCases.getTestCases();
-        resultsStream.println(gson.toJson(results));
-    }
-
-    private static void listExercises() {
-        System.out.println("exercise listing deprecated");
+        TestCases results = testCases.runTests(Main.timeout);
+        resultsStream.println(new Gson().toJson(results));
+        System.exit(0);
     }
 
     private static void usage() {
-        System.out.println("Usage: ./testrunner <list|run> classpath" +
-                " classname timeout resultsfile outfile");
+        System.out.println("Usage: ./testrunner classpath" +
+                " classname timeout resultsfile outfile policyfile");
     }
 
     private Main() {}

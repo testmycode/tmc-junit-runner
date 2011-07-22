@@ -9,10 +9,10 @@ public class TestCase {
     public String message;
     public int status;
 
-    static final int TEST_NOT_STARTED = 0;
     static final int TEST_PASSED = 1;
     static final int TEST_FAILED = 2;
-    static final int TEST_RUNNING = 3;
+    static final int TEST_RUNNING = 4;
+    static final int TEST_NOT_STARTED = 8;
 
     public TestCase(String methodName, String className, String[] pointNames) {
         this.methodName = methodName;
