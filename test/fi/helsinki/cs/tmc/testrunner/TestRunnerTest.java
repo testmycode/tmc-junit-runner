@@ -1,6 +1,5 @@
 package fi.helsinki.cs.tmc.testrunner;
 
-import java.util.ArrayList;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -20,19 +19,36 @@ public class TestRunnerTest {
         assertEquals(1, seekResults.size());
         testCase = seekResults.get(0);
         assertEquals(TestCase.TEST_FAILED, testCase.status);
+
+        seekResults = allCases.findByPointName("one");
+        assertEquals(1, seekResults.size());
+
+        seekResults = allCases.findByPointName("two");
+        assertEquals(2, seekResults.size());
+
+        seekResults = allCases.findByPointName("three");
+        assertEquals(1, seekResults.size());
     }
 
     @Test
-    public void shouldTimeout() throws Exception {
-        TestRunner testCases = new TestRunner(TimeoutTestSubject.class);
-		testCases.runTests(1000);
-        ArrayList<TestCase> results = testCases.getTestCases();
+    public void shouldTimeoutInfiniteLoop() throws Exception {
+        TestRunner testRunner = new TestRunner(TimeoutTestSubject.class);
+        TestCases allCases = testRunner.runTests(1000);
 
-        TestCase infiniteCase = results.get(0);
+        assertEquals(3, allCases.size());
+        TestCase infiniteCase = allCases.findByMethodName("infinite").get(0);
 
         assertEquals("infinite", infiniteCase.methodName);
         assertEquals(TestCase.TEST_FAILED, infiniteCase.status);
         assertTrue(infiniteCase.message.contains("timeout"));
+
+        TestCases passingCases = allCases.findByPointName("passing");
+        assertEquals(2, passingCases.size());
+        for (TestCase t : passingCases) {
+            assertTrue(t.status == TestCase.TEST_NOT_STARTED
+                    || t.status == TestCase.TEST_PASSED);
+        }
+
     }
 
 }
