@@ -41,8 +41,23 @@ public class TestCase {
     }
 
     public void testFailed(Failure f) {
-        this.message = f.getException().toString();
+        this.message = failureMessage(f);
         this.status = TEST_FAILED;
+    }
+    
+    private String failureMessage(Failure f) {
+        String msg = "";
+        if (f.getMessage() != null && !f.getMessage().isEmpty()) {
+            if (!(f.getException() instanceof AssertionError)) {
+                msg += f.getException().getClass().getSimpleName() + ": ";
+            }
+            msg += f.getMessage();
+        }
+        if (!msg.isEmpty()) {
+            return msg;
+        } else {
+            return null;
+        }
     }
 
     public String statusToString() {
