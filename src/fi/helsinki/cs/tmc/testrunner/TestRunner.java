@@ -66,7 +66,7 @@ public class TestRunner implements Runnable {
     private void createTestCases(Class testClass) {
         for (Method m : testClass.getMethods()) {
             Test t = m.getAnnotation(Test.class);
-            Exercise annotation = m.getAnnotation(Exercise.class);
+            Points annotation = m.getAnnotation(Points.class);
             if (t == null || annotation == null) {
                 continue;
             }

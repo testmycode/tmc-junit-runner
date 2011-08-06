@@ -31,7 +31,7 @@ public class TestScannerTest {
         HashMap<String, String[]> methodsFound = new HashMap<String, String[]>();
         for (TestMethod m : outData) {
             if (m.className.equals(testSubjectName)) {
-                methodsFound.put(m.methodName, m.exercises);
+                methodsFound.put(m.methodName, m.points);
             }
         }
 

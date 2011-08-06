@@ -101,7 +101,7 @@ public class TestScannerServerTest {
         for (TestMethod tm : tms) {
             if (tm.className.equals("TestScannerTestSubject")
                     && tm.methodName.equals("twoExTestMethod")
-                    && Arrays.equals(tm.exercises, new String[]{"one", "two"})) {
+                    && Arrays.equals(tm.points, new String[]{"one", "two"})) {
                 found = true;
                 break;
             }

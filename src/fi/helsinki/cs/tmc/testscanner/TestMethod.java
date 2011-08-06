@@ -9,16 +9,16 @@ public class TestMethod {
 
     public String className;
     public String methodName;
-    public String[] exercises;
+    public String[] points;
 
     public TestMethod(String className, String methodName, String[] exercises) {
         this.className = className;
         this.methodName = methodName;
-        this.exercises = exercises;
+        this.points = exercises;
     }
 
     @Override
     public String toString() {
-        return className + "." + methodName + ":" + Arrays.toString(exercises);
+        return className + "." + methodName + ":" + Arrays.toString(points);
     }
 }

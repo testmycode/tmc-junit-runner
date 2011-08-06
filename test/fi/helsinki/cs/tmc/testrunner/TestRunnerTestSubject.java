@@ -8,12 +8,12 @@ import static org.junit.Assert.*;
 @Ignore
 public class TestRunnerTestSubject {
     @Test
-    @Exercise("one two three")
+    @Points("one two three")
     public void successfulTestCaseForOneTwoThree() {
     }
 
     @Test
-    @Exercise("two")
+    @Points("two")
     public void successfulTestCaseForTwo() {
         fail("too bad");
     }

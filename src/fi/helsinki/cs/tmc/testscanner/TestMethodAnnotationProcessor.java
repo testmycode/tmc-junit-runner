@@ -1,6 +1,6 @@
 package fi.helsinki.cs.tmc.testscanner;
 
-import fi.helsinki.cs.tmc.testrunner.Exercise;
+import fi.helsinki.cs.tmc.testrunner.Points;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +30,7 @@ class TestMethodAnnotationProcessor extends AbstractProcessor {
             if (elem.getKind() == ElementKind.METHOD) {
                 String methodName = elem.getSimpleName().toString();
                 String className = elem.getEnclosingElement().getSimpleName().toString();
-                Exercise exerciseAnnotation = elem.getAnnotation(Exercise.class);
+                Points exerciseAnnotation = elem.getAnnotation(Points.class);
                 String[] exercises;
                 if (exerciseAnnotation != null) {
                     exercises = exerciseAnnotation.value().split(" +");
