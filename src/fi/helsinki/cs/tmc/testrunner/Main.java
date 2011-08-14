@@ -35,7 +35,6 @@ public class Main {
             MalformedURLException, ClassNotFoundException,
             InitializationError, NoTestsRemainException,
             FileNotFoundException {
-
         parseArguments(args);
         redirectOutput();
 
@@ -106,9 +105,8 @@ public class Main {
     private static void runExercises() throws MalformedURLException,
             ClassNotFoundException, InitializationError,
             NoTestsRemainException {
-        /*
         TMCSecurityManager.setupSecurityManager(Main.classPath,
-                Main.policyFilename); */ // FIXME!
+                Main.policyFilename);
         loadTestClass();
         TestRunner testCases = new TestRunner(Main.testClass);
         TestCases results = testCases.runTests(Main.timeout);
