@@ -6,6 +6,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 @Ignore
+@Points("class")
 public class TestRunnerTestSubject {
     @Test
     @Points("one two three")
@@ -14,7 +15,7 @@ public class TestRunnerTestSubject {
 
     @Test
     @Points("two")
-    public void successfulTestCaseForTwo() {
+    public void failingTestCaseForTwo() {
         fail("too bad");
     }
 }

@@ -15,7 +15,7 @@ public class TestRunnerTest {
         TestCase testCase = seekResults.get(0);
         assertEquals(TestCase.TEST_PASSED, testCase.status);
 
-        seekResults = allCases.findByMethodName("successfulTestCaseForTwo");
+        seekResults = allCases.findByMethodName("failingTestCaseForTwo");
         assertEquals(1, seekResults.size());
         testCase = seekResults.get(0);
         assertEquals(TestCase.TEST_FAILED, testCase.status);
@@ -28,6 +28,12 @@ public class TestRunnerTest {
 
         seekResults = allCases.findByPointName("three");
         assertEquals(1, seekResults.size());
+        
+        seekResults = allCases.findByPointName("class");
+        assertEquals(2, seekResults.size());
+        
+        seekResults = allCases.findByPointName("ninethousand");
+        assertTrue(seekResults.isEmpty());
     }
 
     @Test

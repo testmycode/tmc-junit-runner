@@ -1,7 +1,9 @@
 package fi.helsinki.cs.tmc.testscanner;
 
 import fi.helsinki.cs.tmc.testrunner.Points;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -30,17 +32,26 @@ class TestMethodAnnotationProcessor extends AbstractProcessor {
             if (elem.getKind() == ElementKind.METHOD) {
                 String methodName = elem.getSimpleName().toString();
                 String className = elem.getEnclosingElement().getSimpleName().toString();
-                Points exerciseAnnotation = elem.getAnnotation(Points.class);
-                String[] exercises;
-                if (exerciseAnnotation != null) {
-                    exercises = exerciseAnnotation.value().split(" +");
-                } else {
-                    exercises = new String[0];
+                List<String> points = pointsOfTestCase(elem);
+                if (!points.isEmpty()) {
+                    testMethods.add(new TestMethod(className, methodName, points.toArray(new String[0])));
                 }
-                testMethods.add(new TestMethod(className, methodName, exercises));
             }
         }
         return false;
+    }
+    
+    private List<String> pointsOfTestCase(Element method) {
+        ArrayList<String> pointNames = new ArrayList<String>();
+        Points classAnnotation = method.getEnclosingElement().getAnnotation(Points.class);
+        if (classAnnotation != null) {
+            pointNames.addAll(Arrays.asList(classAnnotation.value().split(" +")));
+        }
+        Points methodAnnotation = method.getAnnotation(Points.class);
+        if (methodAnnotation != null) {
+            pointNames.addAll(Arrays.asList(methodAnnotation.value().split(" +")));
+        }
+        return pointNames;
     }
 
     public List<TestMethod> getTestMethods() {

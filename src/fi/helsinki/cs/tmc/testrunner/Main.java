@@ -8,7 +8,6 @@ import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runners.model.InitializationError;
 

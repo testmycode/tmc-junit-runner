@@ -1,6 +1,9 @@
 package fi.helsinki.cs.tmc.testrunner;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.Test;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runner.notification.RunNotifier;
@@ -63,17 +66,29 @@ public class TestRunner implements Runnable {
         }
     }
 
-    private void createTestCases(Class testClass) {
+    private void createTestCases(Class<?> testClass) {
         for (Method m : testClass.getMethods()) {
-            Test t = m.getAnnotation(Test.class);
-            Points annotation = m.getAnnotation(Points.class);
-            if (t == null || annotation == null) {
-                continue;
+            if (m.isAnnotationPresent(Test.class)) {
+                List<String> points = pointsOfTestCase(m);
+                if (!points.isEmpty()) {
+                    TestCase testCase = new TestCase(m.getName(), testClass.getName(), points.toArray(new String[0]));
+                    this.testCases.add(testCase);
+                }
             }
-            TestCase testCase = new TestCase(m.getName(), testClass.getName(),
-                    annotation.value().split(" +"));
-            this.testCases.add(testCase);
         }
+    }
+    
+    private List<String> pointsOfTestCase(Method m) {
+        ArrayList<String> pointNames = new ArrayList<String>();
+        Points classAnnotation = m.getDeclaringClass().getAnnotation(Points.class);
+        if (classAnnotation != null) {
+            pointNames.addAll(Arrays.asList(classAnnotation.value().split(" +")));
+        }
+        Points methodAnnotation = m.getAnnotation(Points.class);
+        if (methodAnnotation != null) {
+            pointNames.addAll(Arrays.asList(methodAnnotation.value().split(" +")));
+        }
+        return pointNames;
     }
 
     private void timeoutRunningTestCase() {

@@ -10,7 +10,46 @@ import static org.junit.Assert.*;
 public class TestScannerTest {
 
     @Test
-    public void shouldFindAllTestClassesAndMethodsUnderGivenDirectory() throws Exception {
+    public void shouldReturnAllTestMethodsInADirectoryWithThePointsAnnotation() throws Exception {
+        TestMethod[] outData = invokeTestScanner();
+
+        HashMap<String, String[]> methodPoints = getMethodsToPointsMap(outData, "TestScannerTestSubject");
+
+        assertArrayEquals(arr("one"), methodPoints.get("oneExTestMethod"));
+        assertArrayEquals(arr("one"), methodPoints.get("secondOneExTestMethod"));
+        assertArrayEquals(arr("one", "two"), methodPoints.get("twoExTestMethod"));
+
+        assertArrayEquals(null, methodPoints.get("bareTestMethod"));
+
+        assertFalse(methodPoints.containsKey("notATestMethod"));
+    }
+    
+    @Test
+    public void shouldIncludeClassPointsAnnotationInEachMethod() throws Exception {
+        TestMethod[] outData = invokeTestScanner();
+
+        HashMap<String, String[]> methodPoints = getMethodsToPointsMap(outData, "TestScannerTestSubjectWithClassAnnotation");
+
+        assertArrayEquals(arr("all", "one"), methodPoints.get("oneExTestMethod"));
+        assertArrayEquals(arr("all", "one"), methodPoints.get("secondOneExTestMethod"));
+        assertArrayEquals(arr("all", "one", "two"), methodPoints.get("twoExTestMethod"));
+
+        assertArrayEquals(arr("all"), methodPoints.get("bareTestMethod"));
+
+        assertFalse(methodPoints.containsKey("notATestMethod"));
+    }
+
+    private HashMap<String, String[]> getMethodsToPointsMap(TestMethod[] methods, String className) {
+        HashMap<String, String[]> methodPoints = new HashMap<String, String[]>();
+        for (TestMethod m : methods) {
+            if (m.className.equals(className)) {
+                methodPoints.put(m.methodName, m.points);
+            }
+        }
+        return methodPoints;
+    }
+    
+    private TestMethod[] invokeTestScanner() throws Exception {
         ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
         PrintStream oldOut = System.out;
         try {
@@ -26,22 +65,7 @@ public class TestScannerTest {
         String output = outBuf.toString("UTF-8");
         TestMethod[] outData = new Gson().fromJson(output, TestMethod[].class);
         assertNotNull(outData);
-
-        String testSubjectName = "TestScannerTestSubject";
-        HashMap<String, String[]> methodsFound = new HashMap<String, String[]>();
-        for (TestMethod m : outData) {
-            if (m.className.equals(testSubjectName)) {
-                methodsFound.put(m.methodName, m.points);
-            }
-        }
-
-        assertArrayEquals(arr("one"), methodsFound.get("oneExTestMethod"));
-        assertArrayEquals(arr("one"), methodsFound.get("secondOneExTestMethod"));
-        assertArrayEquals(arr("one", "two"), methodsFound.get("twoExTestMethod"));
-
-        assertArrayEquals(arr(), methodsFound.get("bareTestMethod"));
-
-        assertFalse(methodsFound.containsKey("notATestMethod"));
+        return outData;
     }
 
     private static Object[] arr(Object... a) {
