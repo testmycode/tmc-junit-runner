@@ -110,6 +110,7 @@ public class Main {
         TestRunner testCases = new TestRunner(Main.testClass);
         TestCases results = testCases.runTests(Main.timeout);
         resultsStream.println(new Gson().toJson(results));
+        resultsStream.close();
         System.exit(0);
     }
 
