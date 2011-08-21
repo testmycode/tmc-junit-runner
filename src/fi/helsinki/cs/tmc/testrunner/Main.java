@@ -16,11 +16,8 @@ public class Main {
     private static final int ACTION_USAGE = 0;
     private static final int ACTION_RUNTESTS = 1;
 
-    private static PrintStream outStream = System.out;
     private static PrintStream resultsStream = System.out;
-    private static String outFilename = null;
     private static String resultsFilename = null;
-    private static String policyFilename = null;
     private static long timeout = 60*1000;
 
     private static int action = ACTION_USAGE;
@@ -28,14 +25,14 @@ public class Main {
     private static String className = null;
 
     private static URLClassLoader classLoader = null;
-    private static Class testClass = null;
+    private static Class<?> testClass = null;
 
     public static void main(String[] args) throws
             MalformedURLException, ClassNotFoundException,
             InitializationError, NoTestsRemainException,
             FileNotFoundException {
         parseArguments(args);
-        redirectOutput();
+        openResultStream();
 
         switch (Main.action) {
             case ACTION_RUNTESTS:
@@ -48,16 +45,9 @@ public class Main {
         }
     }
 
-    private static void redirectOutput() throws FileNotFoundException {
-        if (Main.outFilename != null) {
-            Main.outStream =
-                    new PrintStream(new FileOutputStream(Main.outFilename));
-            System.setErr(Main.outStream);
-            System.setOut(Main.outStream);
-        }
+    private static void openResultStream() throws FileNotFoundException {
         if (Main.resultsFilename != null) {
-            Main.resultsStream =
-                    new PrintStream(new FileOutputStream(Main.resultsFilename));
+            Main.resultsStream = new PrintStream(new FileOutputStream(Main.resultsFilename));
         }
     }
 
@@ -80,14 +70,6 @@ public class Main {
         if (args.length >= 4) {
             Main.resultsFilename = args[3];
         }
-
-        if (args.length >= 5) {
-            Main.outFilename = args[4];
-        }
-
-        if (args.length >= 6) {
-            Main.policyFilename = args[5];
-        }
     }
 
     private static void createClassLoader() throws MalformedURLException {
@@ -104,11 +86,9 @@ public class Main {
     private static void runExercises() throws MalformedURLException,
             ClassNotFoundException, InitializationError,
             NoTestsRemainException {
-        TMCSecurityManager.setupSecurityManager(Main.classPath,
-                Main.policyFilename);
         loadTestClass();
-        TestRunner testCases = new TestRunner(Main.testClass);
-        TestCases results = testCases.runTests(Main.timeout);
+        TestRunner testRunner = new TestRunner(Main.testClass);
+        TestCases results = testRunner.runTests(Main.timeout);
         resultsStream.println(new Gson().toJson(results));
         resultsStream.close();
         System.exit(0);
