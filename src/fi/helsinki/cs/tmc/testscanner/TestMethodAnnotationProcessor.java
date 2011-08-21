@@ -1,7 +1,6 @@
 package fi.helsinki.cs.tmc.testscanner;
 
 import fi.helsinki.cs.tmc.testrunner.Points;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

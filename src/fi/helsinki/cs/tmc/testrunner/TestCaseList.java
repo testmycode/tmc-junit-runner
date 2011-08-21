@@ -4,10 +4,10 @@ package fi.helsinki.cs.tmc.testrunner;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class TestCases extends ArrayList<TestCase> {
+public class TestCaseList extends ArrayList<TestCase> {
 
-    public TestCases findByMethodName(String methodName) {
-        TestCases result = new TestCases();
+    public TestCaseList findByMethodName(String methodName) {
+        TestCaseList result = new TestCaseList();
         for (TestCase t : this) {
             if (t.methodName.equals(methodName)) {
                 result.add(t);
@@ -16,8 +16,8 @@ public class TestCases extends ArrayList<TestCase> {
         return result;
     }
 
-    public TestCases findByPointName(String pointName) {
-        TestCases result = new TestCases();
+    public TestCaseList findByPointName(String pointName) {
+        TestCaseList result = new TestCaseList();
         for (TestCase t : this) {
             if (Arrays.asList(t.pointNames).contains(pointName)) {
                 result.add(t);
@@ -27,8 +27,8 @@ public class TestCases extends ArrayList<TestCase> {
     }
 
     @Override
-    public TestCases clone() {
-        TestCases clone = new TestCases();
+    public TestCaseList clone() {
+        TestCaseList clone = new TestCaseList();
 
         for (TestCase t : this) {
             clone.add(new TestCase(t));

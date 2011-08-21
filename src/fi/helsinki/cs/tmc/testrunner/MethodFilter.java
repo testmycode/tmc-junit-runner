@@ -18,10 +18,6 @@ public class MethodFilter extends Filter {
 
     @Override
     public boolean shouldRun(Description description) {
-        if (description.getMethodName().equals(this.methodName))
-        {
-			return true;
-        }
-        return false;
+        return description.getMethodName().equals(this.methodName);
     }
 }

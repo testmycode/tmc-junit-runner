@@ -1,104 +1,118 @@
 package fi.helsinki.cs.tmc.testrunner;
 
 import com.google.gson.Gson;
+import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import org.junit.runner.manipulation.NoTestsRemainException;
-import org.junit.runners.model.InitializationError;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main {
-
-    private static final int ACTION_USAGE = 0;
-    private static final int ACTION_RUNTESTS = 1;
-
-    private static PrintStream resultsStream = System.out;
-    private static String resultsFilename = null;
-    private static long timeout = 60*1000;
-
-    private static int action = ACTION_USAGE;
-    private static String classPath = null;
-    private static String className = null;
-
-    private static URLClassLoader classLoader = null;
-    private static Class<?> testClass = null;
-
-    public static void main(String[] args) throws
-            MalformedURLException, ClassNotFoundException,
-            InitializationError, NoTestsRemainException,
-            FileNotFoundException {
-        parseArguments(args);
-        openResultStream();
-
-        switch (Main.action) {
-            case ACTION_RUNTESTS:
-                runExercises();
-                break;
-
-            default: case ACTION_USAGE:
-                usage();
-                break;
-        }
+    
+    private void printUsage() {
+        PrintStream out = System.out;
+        out.println("Incorrect usage!");
+        out.println("1. Give as parameters a list of test methods with points like");
+        out.println("  \"fully.qualified.ClassName.methodName{point1,point2,etc}\"");
+        out.println();
+        out.println("2. Define the following properties (java -Dprop=value)");
+        out.println("  tmc.test_class_dir  The place to load tests from.");
+        out.println("  tmc.results_file    A file to write results to.");
+        out.println();
     }
+    
 
-    private static void openResultStream() throws FileNotFoundException {
-        if (Main.resultsFilename != null) {
-            Main.resultsStream = new PrintStream(new FileOutputStream(Main.resultsFilename));
-        }
+    private String resultsFilename = null;
+    private long wholeRunTimeout = 60*1000;
+
+    private String testClassDir = null;
+
+    public static void main(String[] args) throws IOException {
+        new Main().run(args);
     }
-
-    private static void parseArguments(String args[]) {
-        if (args.length < 2) {
-            Main.action = ACTION_USAGE;
-            return;
-        }
-
-        Main.action = ACTION_RUNTESTS;
-        Main.classPath = args[0];
-        Main.className = args[1];
-
-        if (args.length >= 3) {
-            try {
-                Main.timeout = Integer.parseInt(args[2]) * 1000;
-            } catch (NumberFormatException e) {}
-        }
-
-        if (args.length >= 4) {
-            Main.resultsFilename = args[3];
-        }
-    }
-
-    private static void createClassLoader() throws MalformedURLException {
-        URL[] urls = { new File(classPath).toURI().toURL() };
-        Main.classLoader = new URLClassLoader(urls);
-    }
-
-    private static void loadTestClass() throws MalformedURLException,
-            ClassNotFoundException {
-        createClassLoader();
-        Main.testClass = Main.classLoader.loadClass(Main.className);
-    }
-
-    private static void runExercises() throws MalformedURLException,
-            ClassNotFoundException, InitializationError,
-            NoTestsRemainException {
-        loadTestClass();
-        TestRunner testRunner = new TestRunner(Main.testClass);
-        TestCases results = testRunner.runTests(Main.timeout);
-        resultsStream.println(new Gson().toJson(results));
-        resultsStream.close();
-        System.exit(0);
-    }
-
-    private static void usage() {
-        System.out.println("Usage: ./testrunner classpath" +
-                " classname timeout resultsfile outfile policyfile");
-    }
-
+    
     private Main() {}
+    
+    private void run(String[] args) throws IOException {
+        try {
+            readProperties();
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            System.out.println();
+            printUsage();
+            System.exit(1);
+        }
+        
+        TestCaseList cases = parseTestCases(args);
+        runExercises(cases);
+        writeResults(cases);
+    }
+
+    private void readProperties() {
+        testClassDir = requireProperty("tmc.test_class_dir");
+        resultsFilename = requireProperty("tmc.results_file");
+    }
+    
+    private String requireProperty(String name) {
+        String prop = System.getProperty(name);
+        if (prop != null) {
+            return prop;
+        } else {
+            throw new IllegalArgumentException("Missing property: " + name);
+        }
+    }
+    
+    private TestCaseList parseTestCases(String[] names) {
+        TestCaseList result = new TestCaseList();
+        
+        Pattern regex = Pattern.compile("^([^{]*)\\.([^.{]*)(?:\\{(.*)\\})?$");
+        
+        for (String name : names) {
+            Matcher matcher = regex.matcher(name);
+            if (matcher.matches()) {
+                String className = matcher.group(1);
+                String methodName = matcher.group(2);
+                String pointList = matcher.group(3);
+                
+                String[] pointNames;
+                if (pointList != null && !pointList.isEmpty()) {
+                    pointNames = pointList.split(",");
+                } else {
+                    pointNames = new String[0];
+                }
+                
+                result.add(new TestCase(methodName, className, pointNames));
+            } else {
+                throw new IllegalArgumentException("Illegal test name: " + name);
+            }
+        }
+        return result;
+    }
+    
+    private void runExercises(TestCaseList cases) {
+        TestRunner testRunner = new TestRunner(getTestClassLoader());
+        testRunner.runTests(cases, wholeRunTimeout);
+    }
+    
+    private ClassLoader getTestClassLoader() {
+        try {
+            return new URLClassLoader(new URL[] { new File(testClassDir).toURI().toURL() });
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Invalid test class dir: " + testClassDir);
+        }
+    }
+    
+    private void writeResults(TestCaseList cases) throws IOException {
+        Writer w = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(resultsFilename)), "UTF-8");
+        w.write(new Gson().toJson(cases));
+        w.close();
+    }
 }
 

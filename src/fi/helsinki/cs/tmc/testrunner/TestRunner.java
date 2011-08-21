@@ -1,107 +1,177 @@
 package fi.helsinki.cs.tmc.testrunner;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import org.junit.Test;
+import org.junit.runner.Description;
+import org.junit.runner.Result;
 import org.junit.runner.manipulation.NoTestsRemainException;
+import org.junit.runner.notification.Failure;
+import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 
-public class TestRunner implements Runnable {
+public class TestRunner {
 
-    private TestCases testCases = new TestCases();
+    private final ClassLoader testClassLoader;
+    
+    // `cases`, `currentCase` and `threadException` are accessed by the thread
+    // and shall be synchronized on `lock`. The thread shall not
+    // modify them after it has been interrupted.
     private final Object lock = new Object();
-    private boolean stop;
-    private int currentCase;
-    private Class testClass;
-
-    public TestRunner(Class testClass) {
-        this.testClass = testClass;
-        this.currentCase = -1;
-        this.stop = false;
-        createTestCases(testClass);
+    private TestCaseList cases;
+    private int currentCaseIndex;
+    private Throwable threadException;
+    
+    public TestRunner(ClassLoader testClassLoader) {
+        this.testClassLoader = testClassLoader;
     }
-
-    public TestCase getCurrentCase() {
-        return this.testCases.get(this.currentCase);
-    }
-
-    public TestCases runTests(long timeout) {
-        Thread runnerThread = new Thread(this);
-
-        runnerThread.start();
+    
+    public synchronized void runTests(TestCaseList cases, long wholeRunTimeout) {
+        this.cases = cases;                    
+        this.currentCaseIndex = 0;
+        this.threadException = null;
+        
+        Thread thread = createTestThread();
+        thread.start();
         try {
-            runnerThread.join(timeout);
-        } catch (InterruptedException ignore) {}
-
-        synchronized(this.lock) {
-            this.stop = true;
-            timeoutRunningTestCase();
-            return this.testCases.clone();
+            thread.join(wholeRunTimeout);
+        } catch (InterruptedException e) {
+            // Ok, we'll stop.
         }
-    }
-
-    public void run() {
-        try {
-            BlockJUnit4ClassRunner runner =
-                    new BlockJUnit4ClassRunner(this.testClass);
-            for (this.currentCase = 0;
-                this.currentCase < this.testCases.size();
-                this.currentCase++) {
-                TestCase testCase = getCurrentCase();
-                RunNotifier notifier = new RunNotifier();
-                notifier.addFirstListener(new TestListener(testCase, lock));
-                runner.filter(new MethodFilter(testCase.methodName));
-                runner.run(notifier);
-
-                if (this.stop) {
-                    break;
-                }
-            }
-        } catch (NoTestsRemainException ex) {
-        } catch (InitializationError ex) {
-        }
-    }
-
-    private void createTestCases(Class<?> testClass) {
-        for (Method m : testClass.getMethods()) {
-            if (m.isAnnotationPresent(Test.class)) {
-                List<String> points = pointsOfTestCase(m);
-                if (!points.isEmpty()) {
-                    TestCase testCase = new TestCase(m.getName(), testClass.getName(), points.toArray(new String[0]));
-                    this.testCases.add(testCase);
+        
+        synchronized(lock) {
+            thread.interrupt();  // The thread should now no longer mutate anything.
+            if (currentCaseIndex < cases.size()) {
+                TestCase currentCase = cases.get(this.currentCaseIndex);
+                currentCase.status = TestCase.TEST_FAILED;
+                if (threadException != null) {
+                    currentCase.message = threadException.toString();
+                } else {
+                    currentCase.message = "timeout";
                 }
             }
         }
     }
     
-    private List<String> pointsOfTestCase(Method m) {
-        ArrayList<String> pointNames = new ArrayList<String>();
-        Points classAnnotation = m.getDeclaringClass().getAnnotation(Points.class);
-        if (classAnnotation != null) {
-            pointNames.addAll(Arrays.asList(classAnnotation.value().split(" +")));
-        }
-        Points methodAnnotation = m.getAnnotation(Points.class);
-        if (methodAnnotation != null) {
-            pointNames.addAll(Arrays.asList(methodAnnotation.value().split(" +")));
-        }
-        return pointNames;
+    private Thread createTestThread() {
+        Thread thread = new Thread(new TestingRunnable(), "TestRunner thread");
+        thread.setDaemon(true);
+        return thread;
     }
+    
+    private class TestingRunnable implements Runnable {
+        @Override
+        public void run() {
+            try {
+                doRun();
+            } catch (Throwable t) {
+                synchronized (lock) {
+                    threadException = t;
+                }
+            }
+        }
+        
+        private void doRun() {
+            TestCase currentCase;
+            while (true) {
+                synchronized (lock) {
+                    if (currentCaseIndex == cases.size()) {
+                        break;
+                    }
+                    currentCase = cases.get(currentCaseIndex);
+                }
 
-    private void timeoutRunningTestCase() {
-        if (this.currentCase < 0 ||
-            this.currentCase >= this.testCases.size()) {
-            return;
+                try {
+                    runTestCase(currentCase);
+                } catch (NoTestsRemainException ex) {
+                    // Don't care about empty test classes.
+                } catch (InitializationError ex) {
+                    synchronized (lock) {
+                        if (Thread.currentThread().isInterrupted()) {
+                            break;
+                        }
+                        currentCase.status = TestCase.TEST_FAILED;
+                        currentCase.message = "Failed to initialize test";
+                    }
+                }
+
+                synchronized (lock) {
+                    if (Thread.currentThread().isInterrupted()) {
+                        break;
+                    }
+                    currentCaseIndex += 1;
+                }
+            }
+        }
+        
+        private void runTestCase(TestCase currentCase)
+                throws NoTestsRemainException, InitializationError {
+            Class<?> testClass = loadTestClass(currentCase.className);
+            BlockJUnit4ClassRunner runner = new BlockJUnit4ClassRunner(testClass);
+            
+            runner.filter(new MethodFilter(currentCase.methodName));
+            
+            RunNotifier notifier = new RunNotifier();
+            notifier.addFirstListener(new TestListener(currentCase));
+            
+            runner.run(notifier);
+        }
+    }
+    
+    
+    private class TestListener extends RunListener {
+        private final TestCase testCase;
+
+        public TestListener(TestCase testCase) {
+            this.testCase = testCase;
+        }
+        
+        @Override
+        public void testRunStarted(Description description) throws Exception {}
+        @Override
+        public void testRunFinished(Result result) throws Exception {}
+        @Override
+        public void testIgnored(Description description) throws Exception {}
+
+        @Override
+        public void testStarted(Description desc) throws Exception {
+            synchronized (lock) {
+                if (!Thread.currentThread().isInterrupted()) {
+                    this.testCase.testStarted();
+                }
+            }
         }
 
-        TestCase t = getCurrentCase();
-        if (t.status == TestCase.TEST_RUNNING) {
-            t.status = TestCase.TEST_FAILED;
-            t.message = "timeout";
+        @Override
+        public void testFinished(Description description) throws Exception {
+            synchronized (lock) {
+                if (!Thread.currentThread().isInterrupted()) {
+                    this.testCase.testFinished();
+                }
+            }
+        }
+
+        @Override
+        public void testFailure(Failure failure) throws Exception {
+            synchronized (lock) {
+                if (!Thread.currentThread().isInterrupted()) {
+                    this.testCase.testFailed(failure);
+                }
+            }
+        }
+    }
+    
+    
+    public TestCase getCurrentCase() {
+        synchronized(lock) {
+            return cases.get(this.currentCaseIndex);
+        }
+    }
+    
+    private Class<?> loadTestClass(String className) {
+        try {
+            return testClassLoader.loadClass(className);
+        } catch (ClassNotFoundException ex) {
+            throw new RuntimeException("Failed to load test class", ex);
         }
     }
 }
-

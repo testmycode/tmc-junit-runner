@@ -6,10 +6,22 @@ import static org.junit.Assert.*;
 public class TestRunnerTest {
     @Test
     public void shouldReturnTestResults() throws Exception {
-        TestRunner testRunner = new TestRunner(TestRunnerTestSubject.class);
-        TestCases allCases = testRunner.runTests(5000);
+        TestCaseList allCases = new TestCaseList();
+        allCases.add(new TestCase(
+                "successfulTestCaseForOneTwoThree",
+                TestRunnerTestSubject.class.getName(),
+                new String[] { "one", "two", "three" }
+                ));
+        allCases.add(new TestCase(
+                "failingTestCaseForTwo",
+                TestRunnerTestSubject.class.getName(),
+                new String[] { "two" }
+                ));
+        
+        TestRunner testRunner = new TestRunner(this.getClass().getClassLoader());
+        testRunner.runTests(allCases, 5000);
 
-        TestCases seekResults =
+        TestCaseList seekResults =
                 allCases.findByMethodName("successfulTestCaseForOneTwoThree");
         assertEquals(1, seekResults.size());
         TestCase testCase = seekResults.get(0);
@@ -29,17 +41,31 @@ public class TestRunnerTest {
         seekResults = allCases.findByPointName("three");
         assertEquals(1, seekResults.size());
         
-        seekResults = allCases.findByPointName("class");
-        assertEquals(2, seekResults.size());
-        
         seekResults = allCases.findByPointName("ninethousand");
         assertTrue(seekResults.isEmpty());
     }
 
     @Test
     public void shouldTimeoutInfiniteLoop() throws Exception {
-        TestRunner testRunner = new TestRunner(TimeoutTestSubject.class);
-        TestCases allCases = testRunner.runTests(1000);
+        TestCaseList allCases = new TestCaseList();
+        allCases.add(new TestCase(
+                "infinite",
+                TimeoutTestSubject.class.getName(),
+                new String[] { "infinite" }
+                ));
+        allCases.add(new TestCase(
+                "empty",
+                TimeoutTestSubject.class.getName(),
+                new String[] { "passing" }
+                ));
+        allCases.add(new TestCase(
+                "empty2",
+                TimeoutTestSubject.class.getName(),
+                new String[] { "passing" }
+                ));
+        
+        TestRunner testRunner = new TestRunner(this.getClass().getClassLoader());
+        testRunner.runTests(allCases, 1000);
 
         assertEquals(3, allCases.size());
         TestCase infiniteCase = allCases.findByMethodName("infinite").get(0);
@@ -48,7 +74,7 @@ public class TestRunnerTest {
         assertEquals(TestCase.TEST_FAILED, infiniteCase.status);
         assertTrue(infiniteCase.message.contains("timeout"));
 
-        TestCases passingCases = allCases.findByPointName("passing");
+        TestCaseList passingCases = allCases.findByPointName("passing");
         assertEquals(2, passingCases.size());
         for (TestCase t : passingCases) {
             assertTrue(t.status == TestCase.TEST_NOT_STARTED

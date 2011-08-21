@@ -73,7 +73,7 @@ public class TestCase {
 
     @Override
     public String toString() {
-        String ret = this.methodName + "(" + this.className + ") " +
+        String ret = this.methodName + " (" + this.className + ") " +
                 statusToString();
         if (this.message != null) {
             ret += ": " + this.message;

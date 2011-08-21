@@ -7,18 +7,15 @@ import org.junit.Test;
 public class TimeoutTestSubject {
 
     @Test
-    @Points("infinite")
     public void infinite() {
         for (;;) {}
     }
 
     @Test
-    @Points("passing")
     public void empty() {
     }
 
     @Test
-    @Points("passing")
     public void empty2() {
     }
 }
