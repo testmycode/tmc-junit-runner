@@ -30,7 +30,7 @@ class TestMethodAnnotationProcessor extends AbstractProcessor {
         for (Element elem : roundEnv.getElementsAnnotatedWith(Test.class)) {
             if (elem.getKind() == ElementKind.METHOD) {
                 String methodName = elem.getSimpleName().toString();
-                String className = elem.getEnclosingElement().getSimpleName().toString();
+                String className = ((TypeElement)(elem.getEnclosingElement())).getQualifiedName().toString();
                 List<String> points = pointsOfTestCase(elem);
                 if (!points.isEmpty()) {
                     testMethods.add(new TestMethod(className, methodName, points.toArray(new String[0])));

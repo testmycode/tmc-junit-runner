@@ -13,7 +13,7 @@ public class TestScannerTest {
     public void shouldReturnAllTestMethodsInADirectoryWithThePointsAnnotation() throws Exception {
         TestMethod[] outData = invokeTestScanner();
 
-        HashMap<String, String[]> methodPoints = getMethodsToPointsMap(outData, "TestScannerTestSubject");
+        HashMap<String, String[]> methodPoints = getMethodsToPointsMap(outData, thisPackage() + ".TestScannerTestSubject");
 
         assertArrayEquals(arr("one"), methodPoints.get("oneExTestMethod"));
         assertArrayEquals(arr("one"), methodPoints.get("secondOneExTestMethod"));
@@ -28,7 +28,7 @@ public class TestScannerTest {
     public void shouldIncludeClassPointsAnnotationInEachMethod() throws Exception {
         TestMethod[] outData = invokeTestScanner();
 
-        HashMap<String, String[]> methodPoints = getMethodsToPointsMap(outData, "TestScannerTestSubjectWithClassAnnotation");
+        HashMap<String, String[]> methodPoints = getMethodsToPointsMap(outData, thisPackage() + ".TestScannerTestSubjectWithClassAnnotation");
 
         assertArrayEquals(arr("all", "one"), methodPoints.get("oneExTestMethod"));
         assertArrayEquals(arr("all", "one"), methodPoints.get("secondOneExTestMethod"));
@@ -37,6 +37,10 @@ public class TestScannerTest {
         assertArrayEquals(arr("all"), methodPoints.get("bareTestMethod"));
 
         assertFalse(methodPoints.containsKey("notATestMethod"));
+    }
+    
+    private String thisPackage() {
+        return this.getClass().getPackage().getName();
     }
 
     private HashMap<String, String[]> getMethodsToPointsMap(TestMethod[] methods, String className) {
