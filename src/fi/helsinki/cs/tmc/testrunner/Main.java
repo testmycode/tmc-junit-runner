@@ -34,8 +34,14 @@ public class Main {
 
     private String testClassDir = null;
 
-    public static void main(String[] args) throws IOException {
-        new Main().run(args);
+    public static void main(String[] args) {
+        try {
+            new Main().run(args);
+        } catch (Throwable t) {
+            System.err.print("Uncaught exception in main thread: ");
+            t.printStackTrace(System.err);
+        }
+        System.exit(0); // Ensure non-daemon threads exit
     }
     
     private Main() {}
