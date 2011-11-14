@@ -94,7 +94,7 @@ public class Main {
                     pointNames = new String[0];
                 }
                 
-                result.add(new TestCase(methodName, className, pointNames));
+                result.add(new TestCase(className, methodName, pointNames));
             } else {
                 throw new IllegalArgumentException("Illegal test name: " + name);
             }

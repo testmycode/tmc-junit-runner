@@ -8,13 +8,11 @@ public class TestRunnerTest {
     public void shouldReturnTestResults() throws Exception {
         TestCaseList allCases = new TestCaseList();
         allCases.add(new TestCase(
-                "successfulTestCaseForOneTwoThree",
-                TestRunnerTestSubject.class.getName(),
+                TestRunnerTestSubject.class.getName(), "successfulTestCaseForOneTwoThree",
                 new String[] { "one", "two", "three" }
                 ));
         allCases.add(new TestCase(
-                "failingTestCaseForTwo",
-                TestRunnerTestSubject.class.getName(),
+                TestRunnerTestSubject.class.getName(), "failingTestCaseForTwo",
                 new String[] { "two" }
                 ));
         
@@ -49,18 +47,15 @@ public class TestRunnerTest {
     public void shouldTimeoutInfiniteLoop() throws Exception {
         TestCaseList allCases = new TestCaseList();
         allCases.add(new TestCase(
-                "infinite",
-                TimeoutTestSubject.class.getName(),
+                TimeoutTestSubject.class.getName(), "infinite",
                 new String[] { "infinite" }
                 ));
         allCases.add(new TestCase(
-                "empty",
-                TimeoutTestSubject.class.getName(),
+                TimeoutTestSubject.class.getName(), "empty",
                 new String[] { "passing" }
                 ));
         allCases.add(new TestCase(
-                "empty2",
-                TimeoutTestSubject.class.getName(),
+                TimeoutTestSubject.class.getName(), "empty2",
                 new String[] { "passing" }
                 ));
         

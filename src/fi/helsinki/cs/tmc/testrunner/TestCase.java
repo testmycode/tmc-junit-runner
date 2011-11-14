@@ -3,9 +3,9 @@ package fi.helsinki.cs.tmc.testrunner;
 import org.junit.runner.notification.Failure;
 
 public class TestCase {
-    public String[] pointNames;
-    public String methodName;
     public String className;
+    public String methodName;
+    public String[] pointNames;
     public String message;
     public int status;
 
@@ -14,7 +14,7 @@ public class TestCase {
     static final int TEST_RUNNING = 4;
     static final int TEST_NOT_STARTED = 8;
 
-    public TestCase(String methodName, String className, String[] pointNames) {
+    public TestCase(String className, String methodName, String[] pointNames) {
         this.methodName = methodName;
         this.className = className;
         this.status = TEST_NOT_STARTED;
