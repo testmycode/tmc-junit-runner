@@ -1,23 +1,19 @@
 package fi.helsinki.cs.tmc.testrunner;
 
 import org.junit.runner.notification.Failure;
+import static fi.helsinki.cs.tmc.testrunner.TestCaseStatus.*;
 
 public class TestCase {
     public String className;
     public String methodName;
     public String[] pointNames;
     public String message;
-    public int status;
-
-    static final int TEST_PASSED = 1;
-    static final int TEST_FAILED = 2;
-    static final int TEST_RUNNING = 4;
-    static final int TEST_NOT_STARTED = 8;
+    public TestCaseStatus status;
 
     public TestCase(String className, String methodName, String[] pointNames) {
         this.methodName = methodName;
         this.className = className;
-        this.status = TEST_NOT_STARTED;
+        this.status = NOT_STARTED;
         this.pointNames = pointNames;
         this.message = null;
     }
@@ -31,18 +27,18 @@ public class TestCase {
     }
 
     public void testStarted() {
-        this.status = TEST_RUNNING;
+        this.status = RUNNING;
     }
 
     public void testFinished() {
-        if (this.status != TEST_FAILED) {
-            this.status = TEST_PASSED;
+        if (this.status != FAILED) {
+            this.status = PASSED;
         }
     }
 
     public void testFailed(Failure f) {
         this.message = failureMessage(f);
-        this.status = TEST_FAILED;
+        this.status = FAILED;
     }
     
     private String failureMessage(Failure f) {
@@ -60,21 +56,9 @@ public class TestCase {
         }
     }
 
-    public String statusToString() {
-        switch (this.status)
-        {
-            case TEST_FAILED: return "failed";
-            case TEST_PASSED: return "passed";
-            case TEST_RUNNING: return "running";
-            case TEST_NOT_STARTED: return "not started";
-            default: return "illegal";
-        }
-    }
-
     @Override
     public String toString() {
-        String ret = this.methodName + " (" + this.className + ") " +
-                statusToString();
+        String ret = this.methodName + " (" + this.className + ") " + status;
         if (this.message != null) {
             ret += ": " + this.message;
         }

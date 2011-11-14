@@ -42,7 +42,7 @@ public class TestRunner {
             thread.interrupt();  // The thread should now no longer mutate anything.
             if (currentCaseIndex < cases.size()) {
                 TestCase currentCase = cases.get(this.currentCaseIndex);
-                currentCase.status = TestCase.TEST_FAILED;
+                currentCase.status = TestCaseStatus.FAILED;
                 if (threadException != null) {
                     currentCase.message = threadException.toString();
                 } else {
@@ -89,7 +89,7 @@ public class TestRunner {
                         if (Thread.currentThread().isInterrupted()) {
                             break;
                         }
-                        currentCase.status = TestCase.TEST_FAILED;
+                        currentCase.status = TestCaseStatus.FAILED;
                         currentCase.message = "Failed to initialize test";
                     }
                 }
