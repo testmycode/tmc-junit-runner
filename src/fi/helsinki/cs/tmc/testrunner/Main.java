@@ -1,6 +1,12 @@
 package fi.helsinki.cs.tmc.testrunner;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.InstanceCreator;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -8,6 +14,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Writer;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -117,8 +124,26 @@ public class Main {
     
     private void writeResults(TestCaseList cases) throws IOException {
         Writer w = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(resultsFilename)), "UTF-8");
-        w.write(new Gson().toJson(cases));
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(StackTraceElement.class, new StackTraceSerializer())
+                .create();
+        w.write(gson.toJson(cases));
         w.close();
+    }
+    
+    private static class StackTraceSerializer implements InstanceCreator<StackTraceElement>, JsonSerializer<StackTraceElement> {
+        public StackTraceElement createInstance(Type type) {
+            return new StackTraceElement("", "", "", 0);
+        }
+
+        public JsonElement serialize(StackTraceElement ste, Type type, JsonSerializationContext jsc) {
+            JsonObject obj = new JsonObject();
+            obj.addProperty("declaredClass", ste.getClassName());
+            obj.addProperty("methodName", ste.getMethodName());
+            obj.addProperty("fileName", ste.getFileName());
+            obj.addProperty("lineNumber", ste.getLineNumber());
+            return obj;
+        }
     }
 }
 

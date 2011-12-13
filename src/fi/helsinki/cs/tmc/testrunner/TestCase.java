@@ -8,6 +8,7 @@ public class TestCase {
     public String methodName;
     public String[] pointNames;
     public String message;
+    public StackTraceElement[] stackTrace;
     public TestCaseStatus status;
 
     public TestCase(String className, String methodName, String[] pointNames) {
@@ -16,6 +17,7 @@ public class TestCase {
         this.status = NOT_STARTED;
         this.pointNames = pointNames;
         this.message = null;
+        this.stackTrace = null;
     }
 
     public TestCase(TestCase aTestCase) {
@@ -24,6 +26,7 @@ public class TestCase {
         this.message = aTestCase.message;
         this.status = aTestCase.status;
         this.pointNames = aTestCase.pointNames.clone();
+        this.stackTrace = aTestCase.stackTrace.clone();
     }
 
     public void testStarted() {
@@ -39,6 +42,11 @@ public class TestCase {
     public void testFailed(Failure f) {
         this.message = failureMessage(f);
         this.status = FAILED;
+        
+        Throwable ex = f.getException();
+        if (ex != null) {
+            stackTrace = ex.getStackTrace();
+        }
     }
     
     private String failureMessage(Failure f) {
@@ -61,6 +69,12 @@ public class TestCase {
         String ret = this.methodName + " (" + this.className + ") " + status;
         if (this.message != null) {
             ret += ": " + this.message;
+        }
+        if (this.stackTrace != null) {
+            ret += "\n";
+            for (StackTraceElement ste : this.stackTrace) {
+                ret += ste.toString() + "\n";
+            }
         }
         return ret;
     }

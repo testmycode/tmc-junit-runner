@@ -8,11 +8,11 @@ public class TestRunnerTest {
     public void shouldReturnTestResults() throws Exception {
         TestCaseList allCases = new TestCaseList();
         allCases.add(new TestCase(
-                TestRunnerTestSubject.class.getName(), "successfulTestCaseForOneTwoThree",
+                TestRunnerTestSubject.class.getName(), "successfulTestCase",
                 new String[] { "one", "two", "three" }
                 ));
         allCases.add(new TestCase(
-                TestRunnerTestSubject.class.getName(), "failingTestCaseForTwo",
+                TestRunnerTestSubject.class.getName(), "failingTestCase",
                 new String[] { "two" }
                 ));
         
@@ -20,15 +20,16 @@ public class TestRunnerTest {
         testRunner.runTests(allCases, 5000);
 
         TestCaseList seekResults =
-                allCases.findByMethodName("successfulTestCaseForOneTwoThree");
+                allCases.findByMethodName("successfulTestCase");
         assertEquals(1, seekResults.size());
         TestCase testCase = seekResults.get(0);
         assertEquals(TestCaseStatus.PASSED, testCase.status);
 
-        seekResults = allCases.findByMethodName("failingTestCaseForTwo");
+        seekResults = allCases.findByMethodName("failingTestCase");
         assertEquals(1, seekResults.size());
         testCase = seekResults.get(0);
         assertEquals(TestCaseStatus.FAILED, testCase.status);
+        assertEquals(16, testCase.stackTrace[1].getLineNumber()); // (below Assert.fail's stack frame)
 
         seekResults = allCases.findByPointName("one");
         assertEquals(1, seekResults.size());
