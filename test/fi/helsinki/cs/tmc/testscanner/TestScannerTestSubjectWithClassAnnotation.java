@@ -1,6 +1,5 @@
 package fi.helsinki.cs.tmc.testscanner;
 
-import fi.helsinki.cs.tmc.testrunner.Points;
 import org.junit.Test;
 
 @Points("all")
