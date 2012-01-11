@@ -19,6 +19,6 @@ public class TestMethod {
 
     @Override
     public String toString() {
-        return className + "." + methodName + ":" + Arrays.toString(points);
+        return className + "." + methodName + "{" + Arrays.toString(points) + "}";
     }
 }

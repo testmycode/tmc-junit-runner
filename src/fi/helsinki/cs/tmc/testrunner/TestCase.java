@@ -1,15 +1,19 @@
 package fi.helsinki.cs.tmc.testrunner;
 
 import org.junit.runner.notification.Failure;
-import static fi.helsinki.cs.tmc.testrunner.TestCaseStatus.*;
+import static fi.helsinki.cs.tmc.testrunner.TestCase.Status.*;
 
 public class TestCase {
+    public enum Status {
+        PASSED, FAILED, RUNNING, NOT_STARTED
+    }
+    
     public String className;
     public String methodName;
     public String[] pointNames;
     public String message;
     public StackTraceElement[] stackTrace;
-    public TestCaseStatus status;
+    public Status status;
 
     public TestCase(String className, String methodName, String[] pointNames) {
         this.methodName = methodName;

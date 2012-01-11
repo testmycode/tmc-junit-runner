@@ -23,12 +23,12 @@ public class TestRunnerTest {
                 allCases.findByMethodName("successfulTestCase");
         assertEquals(1, seekResults.size());
         TestCase testCase = seekResults.get(0);
-        assertEquals(TestCaseStatus.PASSED, testCase.status);
+        assertEquals(TestCase.Status.PASSED, testCase.status);
 
         seekResults = allCases.findByMethodName("failingTestCase");
         assertEquals(1, seekResults.size());
         testCase = seekResults.get(0);
-        assertEquals(TestCaseStatus.FAILED, testCase.status);
+        assertEquals(TestCase.Status.FAILED, testCase.status);
         assertEquals(16, testCase.stackTrace[1].getLineNumber()); // (below Assert.fail's stack frame)
 
         seekResults = allCases.findByPointName("one");
@@ -67,14 +67,14 @@ public class TestRunnerTest {
         TestCase infiniteCase = allCases.findByMethodName("infinite").get(0);
 
         assertEquals("infinite", infiniteCase.methodName);
-        assertEquals(TestCaseStatus.FAILED, infiniteCase.status);
+        assertEquals(TestCase.Status.FAILED, infiniteCase.status);
         assertTrue(infiniteCase.message.contains("timeout"));
 
         TestCaseList passingCases = allCases.findByPointName("passing");
         assertEquals(2, passingCases.size());
         for (TestCase t : passingCases) {
-            assertTrue(t.status == TestCaseStatus.NOT_STARTED
-                    || t.status == TestCaseStatus.PASSED);
+            assertTrue(t.status == TestCase.Status.NOT_STARTED
+                    || t.status == TestCase.Status.PASSED);
         }
 
     }

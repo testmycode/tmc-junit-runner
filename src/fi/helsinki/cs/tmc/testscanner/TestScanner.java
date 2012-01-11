@@ -82,11 +82,18 @@ public class TestScanner {
             args.add(classPath);
         }
 
+        List<String> options = new ArrayList<String>();
+        if (classPath != null) {
+            options.add("-classpath");
+            options.add(classPath);
+        }
+        options.add("-proc:only");
+        
         JavaCompiler.CompilationTask task = compiler.getTask(
                 null,
                 null,
                 null,
-                args,
+                options,
                 null,
                 fileMan.getJavaFileObjectsFromFiles(sourceFiles));
 
