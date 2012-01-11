@@ -40,11 +40,13 @@ public class TestScanner {
     private ArrayList<File> sourceFiles;
     private JavaCompiler compiler;
     private StandardJavaFileManager fileMan;
+    private String classPath;
 
     public TestScanner() {
         sourceFiles = new ArrayList<File>();
         compiler = ToolProvider.getSystemJavaCompiler();
         fileMan = ToolProvider.getSystemJavaCompiler().getStandardFileManager(null, null, null);
+        classPath = null;
     }
 
     public void addSource(File fileOrDir) {
@@ -59,6 +61,10 @@ public class TestScanner {
         }
     }
 
+    public void setClassPath(String classPath) {
+        this.classPath = classPath;
+    }
+
     public void clearSources() {
         sourceFiles.clear();
     }
@@ -67,12 +73,20 @@ public class TestScanner {
         if (sourceFiles.isEmpty()) {
             return Collections.emptyList();
         }
+        
+        ArrayList<String> args = new ArrayList<String>();
+        args.add("-proc:only");
+        
+        if (classPath != null) {
+            args.add("-cp");
+            args.add(classPath);
+        }
 
         JavaCompiler.CompilationTask task = compiler.getTask(
                 null,
                 null,
                 null,
-                Arrays.asList(new String[]{"-proc:only"}),
+                args,
                 null,
                 fileMan.getJavaFileObjectsFromFiles(sourceFiles));
 
