@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javax.annotation.processing.Processor;
 import javax.tools.JavaCompiler;
@@ -80,6 +81,16 @@ public class TestScanner {
         if (!task.call()) {
             throw new RuntimeException("Compilation failed");
         }
-        return processor.getTestMethods();
+        return stableSortedByClassName(processor.getTestMethods());
+    }
+    
+    private List<TestMethod> stableSortedByClassName(List<TestMethod> unsorted) {
+        ArrayList<TestMethod> methods = new ArrayList<TestMethod>(unsorted);
+        Collections.sort(methods, new Comparator<TestMethod>() {
+            public int compare(TestMethod m1, TestMethod m2) {
+                return m1.className.compareTo(m2.className);
+            }
+        });
+        return Collections.unmodifiableList(methods);
     }
 }
