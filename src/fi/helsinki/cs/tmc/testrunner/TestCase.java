@@ -54,17 +54,24 @@ public class TestCase {
     }
     
     private String failureMessage(Failure f) {
-        String msg = "";
-        if (f.getMessage() != null && !f.getMessage().isEmpty()) {
-            if (!(f.getException() instanceof AssertionError)) {
-                msg += f.getException().getClass().getSimpleName() + ": ";
-            }
-            msg += f.getMessage();
-        }
-        if (!msg.isEmpty()) {
-            return msg;
-        } else {
+        if (f.getException() == null) { // Not sure if this is possible
             return null;
+        }
+        
+        String exceptionClass = f.getException().getClass().getSimpleName();
+        String exMsg = f.getException().getMessage();
+        if (exceptionClass.equals("AssertionError")) {
+            if (exMsg != null) {
+                return exMsg;
+            } else {
+                return exceptionClass;
+            }
+        } else {
+            if (exMsg != null) {
+                return exceptionClass + ": " + exMsg;
+            } else {
+                return exceptionClass;
+            }
         }
     }
 
