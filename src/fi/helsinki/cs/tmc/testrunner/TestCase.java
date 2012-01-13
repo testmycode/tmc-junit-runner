@@ -12,7 +12,7 @@ public class TestCase {
     public String methodName;
     public String[] pointNames;
     public String message;
-    public StackTraceElement[] stackTrace;
+    public CaughtException exception;
     public Status status;
 
     public TestCase(String className, String methodName, String[] pointNames) {
@@ -21,7 +21,7 @@ public class TestCase {
         this.status = NOT_STARTED;
         this.pointNames = pointNames;
         this.message = null;
-        this.stackTrace = null;
+        this.exception = null;
     }
 
     public TestCase(TestCase aTestCase) {
@@ -30,7 +30,7 @@ public class TestCase {
         this.message = aTestCase.message;
         this.status = aTestCase.status;
         this.pointNames = aTestCase.pointNames.clone();
-        this.stackTrace = aTestCase.stackTrace.clone();
+        this.exception = aTestCase.exception.clone();
     }
 
     public void testStarted() {
@@ -49,7 +49,7 @@ public class TestCase {
         
         Throwable ex = f.getException();
         if (ex != null) {
-            stackTrace = ex.getStackTrace();
+            this.exception = new CaughtException(ex);
         }
     }
     
@@ -81,11 +81,8 @@ public class TestCase {
         if (this.message != null) {
             ret += ": " + this.message;
         }
-        if (this.stackTrace != null) {
-            ret += "\n";
-            for (StackTraceElement ste : this.stackTrace) {
-                ret += ste.toString() + "\n";
-            }
+        if (this.exception != null) {
+            ret += "\n" + this.exception.toString();
         }
         return ret;
     }
