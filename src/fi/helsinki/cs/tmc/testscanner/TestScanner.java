@@ -31,8 +31,9 @@ public class TestScanner {
                 System.exit(0);
             } else if (arg.equals("--test-runner-format")) {
                 outputFormat = OutputFormat.TEST_RUNNER;
+            } else {
+                scanner.addSource(new File(arg));
             }
-            scanner.addSource(new File(arg));
         }
 
         List<TestMethod> tests = scanner.findTests();
