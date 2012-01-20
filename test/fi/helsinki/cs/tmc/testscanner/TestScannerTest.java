@@ -11,7 +11,7 @@ public class TestScannerTest {
 
     @Test
     public void shouldReturnAllTestMethodsInADirectoryWithThePointsAnnotation() throws Exception {
-        TestMethod[] outData = invokeTestScanner();
+        TestMethod[] outData = scanTestMethods("test");
 
         HashMap<String, String[]> methodPoints = getMethodsToPointsMap(outData, thisPackage() + ".TestScannerTestSubject");
 
@@ -26,7 +26,7 @@ public class TestScannerTest {
     
     @Test
     public void shouldIncludeClassPointsAnnotationInEachMethod() throws Exception {
-        TestMethod[] outData = invokeTestScanner();
+        TestMethod[] outData = scanTestMethods("test");
 
         HashMap<String, String[]> methodPoints = getMethodsToPointsMap(outData, thisPackage() + ".TestScannerTestSubjectWithClassAnnotation");
 
@@ -37,6 +37,14 @@ public class TestScannerTest {
         assertArrayEquals(arr("all"), methodPoints.get("bareTestMethod"));
 
         assertFalse(methodPoints.containsKey("notATestMethod"));
+    }
+    
+    @Test
+    public void canPrintTestsInAWayThatSuitsTheTestRunner() throws Exception {
+        String output = invokeTestScanner("--test-runner-format", "test");
+        
+        assertTrue(output.contains("TestScannerTestSubject.oneExTestMethod{one}"));
+        assertTrue(output.contains("TestScannerTestSubject.twoExTestMethod{one,two}"));
     }
     
     private String thisPackage() {
@@ -53,20 +61,21 @@ public class TestScannerTest {
         return methodPoints;
     }
     
-    private TestMethod[] invokeTestScanner() throws Exception {
+    private String invokeTestScanner(String... args) throws Exception {
         ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
         PrintStream oldOut = System.out;
         try {
             System.setOut(new PrintStream(outBuf, true, "UTF-8"));
-            String[] args = {
-                "test"
-            };
             TestScanner.main(args);
         } finally {
             System.setOut(oldOut);
         }
 
-        String output = outBuf.toString("UTF-8");
+        return outBuf.toString("UTF-8");
+    }
+    
+    private TestMethod[] scanTestMethods(String... args) throws Exception {
+        String output = invokeTestScanner(args);
         TestMethod[] outData = new Gson().fromJson(output, TestMethod[].class);
         assertNotNull(outData);
         return outData;

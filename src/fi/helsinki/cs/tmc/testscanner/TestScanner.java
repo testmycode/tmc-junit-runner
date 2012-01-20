@@ -14,27 +14,56 @@ import javax.tools.ToolProvider;
 
 public class TestScanner {
 
+    enum OutputFormat { JSON, TEST_RUNNER }
+    
     public static void main(String[] args) {
         if (args.length == 0) {
             showHelp();
             System.exit(1);
         }
+        
+        OutputFormat outputFormat = OutputFormat.JSON;
 
         TestScanner scanner = new TestScanner();
         for (String arg : args) {
             if (arg.equals("-h") || arg.equals("--help")) {
                 showHelp();
                 System.exit(0);
+            } else if (arg.equals("--test-runner-format")) {
+                outputFormat = OutputFormat.TEST_RUNNER;
             }
             scanner.addSource(new File(arg));
         }
 
         List<TestMethod> tests = scanner.findTests();
-        System.out.println(new Gson().toJson(tests));
+        if (outputFormat == OutputFormat.JSON) {
+            System.out.println(new Gson().toJson(tests));
+        } else if (outputFormat == OutputFormat.TEST_RUNNER) {
+            System.out.println(toTestRunnerFormat(tests));
+        }
     }
 
     private static void showHelp() {
         System.out.println("Usage: java [...] " + TestScanner.class.getName() + " files-or-dirs");
+    }
+    
+    private static String toTestRunnerFormat(List<TestMethod> tests) {
+        StringBuilder sb = new StringBuilder();
+        for (TestMethod test : tests) {
+            sb.append(test.className).append('.').append(test.methodName).append('{');
+            commaSeparated(sb, test.points);
+            sb.append("}\n");
+        }
+        return sb.toString();
+    }
+    
+    private static void commaSeparated(StringBuilder sb, String[] elements) {
+        if (elements.length > 0) {
+            for (int i = 0; i < elements.length - 1; ++i) {
+                sb.append(elements[i]).append(',');
+            }
+            sb.append(elements[elements.length - 1]);
+        }
     }
     
     private ArrayList<File> sourceFiles;
