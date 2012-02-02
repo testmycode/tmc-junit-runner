@@ -26,10 +26,19 @@ public class StackTraceSerializer implements InstanceCreator<StackTraceElement>,
 
     public StackTraceElement deserialize(JsonElement je, Type type, JsonDeserializationContext jdc) throws JsonParseException {
         JsonObject obj = je.getAsJsonObject();
-        String declaringClass = obj.get("declaringClass").getAsString();
-        String methodName = obj.get("methodName").getAsString();
-        String fileName = obj.get("fileName").getAsString();
+        String declaringClass = getStringOrNull(obj, "declaringClass");
+        String methodName = getStringOrNull(obj, "methodName");
+        String fileName = getStringOrNull(obj, "fileName");
         int lineNumber = obj.get("lineNumber").getAsInt();
         return new StackTraceElement(declaringClass, methodName, fileName, lineNumber);
+    }
+    
+    private String getStringOrNull(JsonObject obj, String property) {
+        JsonElement e = obj.get(property);
+        if (e != null && !e.isJsonNull()) {
+            return e.getAsString();
+        } else {
+            return null;
+        }
     }
 }
