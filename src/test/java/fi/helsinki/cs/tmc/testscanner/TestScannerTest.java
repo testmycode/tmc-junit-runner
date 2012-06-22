@@ -8,10 +8,12 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class TestScannerTest {
+    
+    private static final String testDir = "src/test/java";
 
     @Test
     public void shouldReturnAllTestMethodsInADirectoryWithThePointsAnnotation() throws Exception {
-        TestMethod[] outData = scanTestMethods("test");
+        TestMethod[] outData = scanTestMethods(testDir);
 
         HashMap<String, String[]> methodPoints = getMethodsToPointsMap(outData, thisPackage() + ".TestScannerTestSubject");
 
@@ -26,7 +28,7 @@ public class TestScannerTest {
     
     @Test
     public void shouldIncludeClassPointsAnnotationInEachMethod() throws Exception {
-        TestMethod[] outData = scanTestMethods("test");
+        TestMethod[] outData = scanTestMethods(testDir);
 
         HashMap<String, String[]> methodPoints = getMethodsToPointsMap(outData, thisPackage() + ".TestScannerTestSubjectWithClassAnnotation");
 
@@ -41,7 +43,7 @@ public class TestScannerTest {
     
     @Test
     public void canPrintTestsInAWayThatSuitsTheTestRunner() throws Exception {
-        String output = invokeTestScanner("--test-runner-format", "test");
+        String output = invokeTestScanner("--test-runner-format", testDir);
         
         assertTrue(output.contains("TestScannerTestSubject.oneExTestMethod{one}"));
         assertTrue(output.contains("TestScannerTestSubject.twoExTestMethod{one,two}"));

@@ -1,4 +1,2 @@
-build
-dist
-private
-
+/nbproject/private
+/target
