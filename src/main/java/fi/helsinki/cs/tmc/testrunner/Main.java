@@ -1,14 +1,8 @@
 package fi.helsinki.cs.tmc.testrunner;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.PrintStream;
-import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -117,12 +111,7 @@ public class Main {
     }
     
     private void writeResults(TestCaseList cases) throws IOException {
-        Writer w = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(resultsFilename)), "UTF-8");
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(StackTraceElement.class, new StackTraceSerializer())
-                .create();
-        w.write(gson.toJson(cases));
-        w.close();
+        cases.writeToJsonFile(new File(resultsFilename));
     }
 }
 
