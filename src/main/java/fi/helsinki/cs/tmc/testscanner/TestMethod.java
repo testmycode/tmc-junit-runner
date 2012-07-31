@@ -1,7 +1,5 @@
 package fi.helsinki.cs.tmc.testscanner;
 
-import java.util.Arrays;
-
 /**
  * A test method that is required to pass zero or more exercises.
  */
@@ -19,6 +17,15 @@ public class TestMethod {
 
     @Override
     public String toString() {
-        return className + "." + methodName + "{" + Arrays.toString(points) + "}";
+        StringBuilder result = new StringBuilder();
+        result.append(className).append('.').append(methodName).append('{');
+        if (points.length > 0) {
+            for (int i = 0; i < points.length - 1; ++i) {
+                result.append(points[i]).append(',');
+            }
+            result.append(points[points.length-1]);
+        }
+        result.append('}');
+        return result.toString();
     }
 }
