@@ -90,7 +90,11 @@ public class TestRunner {
                             break;
                         }
                         currentCase.status = TestCase.Status.FAILED;
-                        currentCase.message = "Failed to initialize test";
+                        currentCase.message = "Failed to initialize test: " + ex.getMessage();
+                        if (!ex.getCauses().isEmpty()) {
+                            currentCase.message += "\n" + ex.getCauses().get(0).getMessage();
+                            currentCase.exception = new CaughtException(ex.getCauses().get(0));
+                        }
                     }
                 }
 
