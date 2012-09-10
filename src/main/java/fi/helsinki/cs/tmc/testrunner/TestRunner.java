@@ -1,12 +1,17 @@
 package fi.helsinki.cs.tmc.testrunner;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import org.junit.runner.Description;
 import org.junit.runner.Result;
+import org.junit.runner.RunWith;
+import org.junit.runner.Runner;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.runners.ParentRunner;
 import org.junit.runners.model.InitializationError;
 
 public class TestRunner {
@@ -96,6 +101,15 @@ public class TestRunner {
                             currentCase.exception = new CaughtException(ex.getCauses().get(0));
                         }
                     }
+                } catch (Exception ex) {
+                    synchronized (lock) {
+                        if (Thread.currentThread().isInterrupted()) {
+                            break;
+                        }
+                        currentCase.status = TestCase.Status.FAILED;
+                        currentCase.message = "Failed to run test.";
+                        currentCase.exception = new CaughtException(ex);
+                    }
                 }
 
                 synchronized (lock) {
@@ -110,14 +124,44 @@ public class TestRunner {
         private void runTestCase(TestCase currentCase)
                 throws NoTestsRemainException, InitializationError {
             Class<?> testClass = loadTestClass(currentCase.className);
-            BlockJUnit4ClassRunner runner = new BlockJUnit4ClassRunner(testClass);
+            ParentRunner<?> runner = createRunner(testClass);
             
             runner.filter(new MethodFilter(currentCase.methodName));
             
             RunNotifier notifier = new RunNotifier();
             notifier.addFirstListener(new TestListener(currentCase));
-            
+
             runner.run(notifier);
+        }
+        
+        private ParentRunner<?> createRunner(Class<?> testClass) throws InitializationError {
+            RunWith rw = testClass.getAnnotation(RunWith.class);
+            if (rw == null) {
+                return new BlockJUnit4ClassRunner(testClass);
+            }
+            
+            Class<? extends Runner> runnerCls = rw.value();
+            if (!ParentRunner.class.isAssignableFrom(runnerCls)) {
+                throw new InitializationError("TMC requires @RunWith to specify a class inheriting org.junit.runners.ParentRunner");
+            }
+            // Could check the type parameter too, but the code to do that would be very complex it seems.
+            
+            Constructor<? extends Runner> ctor;
+            try {
+                ctor = runnerCls.getConstructor(Class.class);
+            } catch (NoSuchMethodException ex) {
+                throw new InitializationError("Runner specified with @RunWith lacks a public constructor taking a test class");
+            }
+            
+            try {
+                return ((ParentRunner<?>)ctor.newInstance(testClass));
+            } catch (InstantiationException ex) {
+                throw new InitializationError("Failed to initialize test runner specified with @RunWith: " + ex.getMessage());
+            } catch (IllegalAccessException ex) {
+                throw new InitializationError(ex);
+            } catch (InvocationTargetException ex) {
+                throw new InitializationError("Failed to initialize test runner specified with @RunWith: " + ex.getMessage());
+            }
         }
     }
     

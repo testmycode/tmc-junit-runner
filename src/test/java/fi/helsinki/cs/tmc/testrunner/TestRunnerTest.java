@@ -79,5 +79,29 @@ public class TestRunnerTest {
         }
 
     }
+    
+    @Test
+    public void shouldHonorRunWithAnnotation() {
+        MockRunner.reset();
+        
+        TestCaseList allCases = new TestCaseList();
+        allCases.add(new TestCase(
+                RunWithTestSubject.class.getName(), "testCase",
+                new String[] {}
+                ));
+        
+        TestRunner testRunner = new TestRunner(this.getClass().getClassLoader());
+        
+        assertFalse(MockRunner.runCalled);
+        testRunner.runTests(allCases, 5000 + 1000000000);
+        System.out.println(allCases.get(0));
+        System.out.println(allCases.get(0).status);
+        if (allCases.get(0).status == TestCase.Status.FAILED) {
+            fail("Test failed: " + allCases.get(0).message);
+        }
+        assertTrue(MockRunner.runCalled);
+        
+        MockRunner.reset();
+    }
 }
 
