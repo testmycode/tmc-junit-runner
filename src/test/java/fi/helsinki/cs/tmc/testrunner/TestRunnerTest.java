@@ -17,7 +17,7 @@ public class TestRunnerTest {
                 ));
         
         TestRunner testRunner = new TestRunner(this.getClass().getClassLoader());
-        testRunner.runTests(allCases, 5000);
+        testRunner.runTests(allCases, 5);
 
         TestCaseList seekResults =
                 allCases.findByMethodName("successfulTestCase");
@@ -62,7 +62,7 @@ public class TestRunnerTest {
                 ));
         
         TestRunner testRunner = new TestRunner(this.getClass().getClassLoader());
-        testRunner.runTests(allCases, 1000);
+        testRunner.runTests(allCases, 1);
 
         assertEquals(3, allCases.size());
         TestCase infiniteCase = allCases.findByMethodName("infinite").get(0);
@@ -93,7 +93,7 @@ public class TestRunnerTest {
         TestRunner testRunner = new TestRunner(this.getClass().getClassLoader());
         
         assertFalse(MockRunner.runCalled);
-        testRunner.runTests(allCases, 5000 + 1000000000);
+        testRunner.runTests(allCases, 1000000);
         System.out.println(allCases.get(0));
         System.out.println(allCases.get(0).status);
         if (allCases.get(0).status == TestCase.Status.FAILED) {

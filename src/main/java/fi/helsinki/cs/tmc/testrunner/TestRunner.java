@@ -30,7 +30,7 @@ public class TestRunner {
         this.testClassLoader = testClassLoader;
     }
     
-    public synchronized void runTests(TestCaseList cases, long wholeRunTimeout) {
+    public synchronized void runTests(TestCaseList cases, int suiteTimeout) {
         this.cases = cases;                    
         this.currentCaseIndex = 0;
         this.threadException = null;
@@ -38,7 +38,7 @@ public class TestRunner {
         Thread thread = createTestThread();
         thread.start();
         try {
-            thread.join(wholeRunTimeout);
+            thread.join(suiteTimeout * 1000l);
         } catch (InterruptedException e) {
             // Ok, we'll stop.
         }

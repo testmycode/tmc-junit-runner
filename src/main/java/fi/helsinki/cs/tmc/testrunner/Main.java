@@ -20,12 +20,15 @@ public class Main {
         out.println("2. Define the following properties (java -Dprop=value)");
         out.println("  tmc.test_class_dir  The place to load tests from.");
         out.println("  tmc.results_file    A file to write results to.");
+        out.println("  tmc.suite_timeout   Timeout in seconds (default: " + DEFAULT_SUITE_TIMEOUT + ").");
         out.println();
     }
     
+    
+    private static final int DEFAULT_SUITE_TIMEOUT = 60;
 
     private String resultsFilename = null;
-    private long wholeRunTimeout = 60*1000;
+    private int suiteTimeout;
 
     private String testClassDir = null;
 
@@ -59,6 +62,7 @@ public class Main {
     private void readProperties() {
         testClassDir = requireProperty("tmc.test_class_dir");
         resultsFilename = requireProperty("tmc.results_file");
+        suiteTimeout = tryGetIntProperty("tmc.suite_timeout", DEFAULT_SUITE_TIMEOUT);
     }
     
     private String requireProperty(String name) {
@@ -67,6 +71,19 @@ public class Main {
             return prop;
         } else {
             throw new IllegalArgumentException("Missing property: " + name);
+        }
+    }
+    
+    private Integer tryGetIntProperty(String name, Integer dflt) {
+        String prop = System.getProperty(name);
+        if (prop != null) {
+            try {
+                return Integer.parseInt(prop);
+            } catch (NumberFormatException e) {
+                return dflt;
+            }
+        } else {
+            return dflt;
         }
     }
     
@@ -99,7 +116,7 @@ public class Main {
     
     private void runExercises(TestCaseList cases) {
         TestRunner testRunner = new TestRunner(getTestClassLoader());
-        testRunner.runTests(cases, wholeRunTimeout);
+        testRunner.runTests(cases, suiteTimeout);
     }
     
     private ClassLoader getTestClassLoader() {
