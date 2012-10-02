@@ -94,8 +94,6 @@ public class TestRunnerTest {
         
         assertFalse(MockRunner.runCalled);
         testRunner.runTests(allCases, 1000000);
-        System.out.println(allCases.get(0));
-        System.out.println(allCases.get(0).status);
         if (allCases.get(0).status == TestCase.Status.FAILED) {
             fail("Test failed: " + allCases.get(0).message);
         }
