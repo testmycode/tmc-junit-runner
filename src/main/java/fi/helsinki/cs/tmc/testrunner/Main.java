@@ -25,7 +25,7 @@ public class Main {
     }
     
     
-    private static final int DEFAULT_SUITE_TIMEOUT = 60;
+    private static final int DEFAULT_SUITE_TIMEOUT = 180;
 
     private String resultsFilename = null;
     private int suiteTimeout;
