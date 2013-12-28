@@ -73,10 +73,14 @@ public class TestScanner {
     private String classPath;
 
     public TestScanner() {
-        sourceFiles = new ArrayList<File>();
-        compiler = ToolProvider.getSystemJavaCompiler();
-        fileMan = ToolProvider.getSystemJavaCompiler().getStandardFileManager(null, null, null);
-        classPath = null;
+        this(ToolProvider.getSystemJavaCompiler());
+    }
+
+    public TestScanner(JavaCompiler compiler) {
+        this.sourceFiles = new ArrayList<File>();
+        this.compiler = compiler;
+        this.fileMan = compiler.getStandardFileManager(null, null, null);
+        this.classPath = null;
     }
 
     public void addSource(File fileOrDir) {
