@@ -10,12 +10,12 @@
     <name>TMC JUnit Runner</name>
     <description>TMC's JUnit test runner</description>
     <url>https://github.com/testmycode/tmc-junit-runner</url>
-    
+
     <organization>
         <name>University of Helsinki, Department of Computer Science</name>
         <url>http://cs.helsinki.fi/</url>
     </organization>
-    
+
     <licenses>
         <license>
             <name>GNU Lesser General Public License</name>
@@ -23,14 +23,14 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    
+
     <scm>
         <connection>scm:git:https://github.com/testmycode/tmc-junit-runner.git</connection>
         <developerConnection>scm:git:git@github.com:testmycode/tmc-junit-runner.git</developerConnection>
         <url>https://github.com/testmycode/tmc-junit-runner</url>
-      <tag>HEAD</tag>
-  </scm>
-    
+        <tag>HEAD</tag>
+    </scm>
+
     <developers>
         <developer>
             <id>mpartel</id>
@@ -38,7 +38,7 @@
             <email>martin.partel@gmail.com</email>
         </developer>
     </developers>
-    
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -55,7 +55,7 @@
             <version>2.2.4</version>
         </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
             <!-- Compiler options -->
@@ -64,6 +64,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
                     <showDeprecation>true</showDeprecation>
                 </configuration>
             </plugin>
@@ -103,7 +105,7 @@
             </plugin>
         </plugins>
     </build>
-    
+
     <!-- Deploy to maven.testmycode.net/nexus -->
     <distributionManagement>
         <repository>
@@ -117,7 +119,7 @@
             <url>http://maven.testmycode.net/nexus/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
-    
+
     <!-- Use maven.testmycode.net/nexus as a repo -->
     <repositories>
         <repository>
