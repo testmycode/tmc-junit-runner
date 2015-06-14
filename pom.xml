@@ -10,12 +10,12 @@
     <name>TMC JUnit Runner</name>
     <description>TMC's JUnit test runner</description>
     <url>https://github.com/testmycode/tmc-junit-runner</url>
-    
+
     <organization>
         <name>University of Helsinki, Department of Computer Science</name>
         <url>http://cs.helsinki.fi/</url>
     </organization>
-    
+
     <licenses>
         <license>
             <name>GNU Lesser General Public License</name>
@@ -23,14 +23,14 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    
+
     <scm>
         <connection>scm:git:https://github.com/testmycode/tmc-junit-runner.git</connection>
         <developerConnection>scm:git:git@github.com:testmycode/tmc-junit-runner.git</developerConnection>
         <url>https://github.com/testmycode/tmc-junit-runner</url>
       <tag>HEAD</tag>
   </scm>
-    
+
     <developers>
         <developer>
             <id>mpartel</id>
@@ -38,10 +38,38 @@
             <email>martin.partel@gmail.com</email>
         </developer>
     </developers>
-    
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <!-- Find tools.jar - http://stackoverflow.com/questions/3080437/jdk-tools-jar-as-maven-dependency -->
+    <profiles>
+        <profile>
+            <id>default-profile</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>${java.home}/../lib/tools.jar</exists>
+                </file>
+            </activation>
+            <properties>
+                <toolsjar>${java.home}/../lib/tools.jar</toolsjar>
+            </properties>
+        </profile>
+        <profile>
+            <id>mac-profile</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <file>
+                    <exists>${java.home}/../Classes/classes.jar</exists>
+                </file>
+            </activation>
+            <properties>
+                <toolsjar>${java.home}/../Classes/classes.jar</toolsjar>
+            </properties>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>
@@ -54,8 +82,15 @@
             <artifactId>gson</artifactId>
             <version>2.2.4</version>
         </dependency>
+        <dependency>
+            <groupId>com.sun</groupId>
+            <artifactId>tools</artifactId>
+            <scope>system</scope>
+            <version>1.6.0</version>  <!-- doesn't matter, the installed JDK's JAR is always used -->
+            <systemPath>${toolsjar}</systemPath>
+        </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
             <!-- Compiler options -->
@@ -103,7 +138,7 @@
             </plugin>
         </plugins>
     </build>
-    
+
     <!-- Deploy to maven.testmycode.net/nexus -->
     <distributionManagement>
         <repository>
@@ -117,7 +152,7 @@
             <url>http://maven.testmycode.net/nexus/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
-    
+
     <!-- Use maven.testmycode.net/nexus as a repo -->
     <repositories>
         <repository>
