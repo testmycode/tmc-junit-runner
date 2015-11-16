@@ -10,7 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Main {
-    
+
     private void printUsage() {
         PrintStream out = System.out;
         out.println("Incorrect usage!");
@@ -23,8 +23,8 @@ public class Main {
         out.println("  tmc.suite_timeout   Timeout in seconds (default: " + DEFAULT_SUITE_TIMEOUT + ").");
         out.println();
     }
-    
-    
+
+
     private static final int DEFAULT_SUITE_TIMEOUT = 180;
 
     private String resultsFilename = null;
@@ -41,9 +41,9 @@ public class Main {
         }
         System.exit(0); // Ensure non-daemon threads exit
     }
-    
+
     private Main() {}
-    
+
     private void run(String[] args) throws IOException {
         try {
             readProperties();
@@ -53,7 +53,7 @@ public class Main {
             printUsage();
             System.exit(1);
         }
-        
+
         TestCaseList cases = parseTestCases(args);
         runExercises(cases);
         writeResults(cases);
@@ -64,7 +64,7 @@ public class Main {
         resultsFilename = requireProperty("tmc.results_file");
         suiteTimeout = tryGetIntProperty("tmc.suite_timeout", DEFAULT_SUITE_TIMEOUT);
     }
-    
+
     private String requireProperty(String name) {
         String prop = System.getProperty(name);
         if (prop != null) {
@@ -73,7 +73,7 @@ public class Main {
             throw new IllegalArgumentException("Missing property: " + name);
         }
     }
-    
+
     private Integer tryGetIntProperty(String name, Integer dflt) {
         String prop = System.getProperty(name);
         if (prop != null) {
@@ -86,26 +86,26 @@ public class Main {
             return dflt;
         }
     }
-    
+
     private TestCaseList parseTestCases(String[] names) {
         TestCaseList result = new TestCaseList();
-        
+
         Pattern regex = Pattern.compile("^([^{]*)\\.([^.{]*)(?:\\{(.*)\\})?$");
-        
+
         for (String name : names) {
             Matcher matcher = regex.matcher(name);
             if (matcher.matches()) {
                 String className = matcher.group(1);
                 String methodName = matcher.group(2);
                 String pointList = matcher.group(3);
-                
+
                 String[] pointNames;
                 if (pointList != null && !pointList.isEmpty()) {
                     pointNames = pointList.split(",");
                 } else {
                     pointNames = new String[0];
                 }
-                
+
                 result.add(new TestCase(className, methodName, pointNames));
             } else {
                 throw new IllegalArgumentException("Illegal test name: " + name);
@@ -113,12 +113,12 @@ public class Main {
         }
         return result;
     }
-    
+
     private void runExercises(TestCaseList cases) {
         TestRunner testRunner = new TestRunner(getTestClassLoader());
         testRunner.runTests(cases, suiteTimeout);
     }
-    
+
     private ClassLoader getTestClassLoader() {
         try {
             return new URLClassLoader(new URL[] { new File(testClassDir).toURI().toURL() });
@@ -126,9 +126,8 @@ public class Main {
             throw new IllegalArgumentException("Invalid test class dir: " + testClassDir);
         }
     }
-    
+
     private void writeResults(TestCaseList cases) throws IOException {
         cases.writeToJsonFile(new File(resultsFilename));
     }
 }
-

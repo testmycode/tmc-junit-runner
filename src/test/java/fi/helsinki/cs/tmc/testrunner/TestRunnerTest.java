@@ -15,7 +15,7 @@ public class TestRunnerTest {
                 TestRunnerTestSubject.class.getName(), "failingTestCase",
                 new String[] { "two" }
                 ));
-        
+
         TestRunner testRunner = new TestRunner(this.getClass().getClassLoader());
         testRunner.runTests(allCases, 5);
 
@@ -40,7 +40,7 @@ public class TestRunnerTest {
 
         seekResults = allCases.findByPointName("three");
         assertEquals(1, seekResults.size());
-        
+
         seekResults = allCases.findByPointName("ninethousand");
         assertTrue(seekResults.isEmpty());
     }
@@ -60,7 +60,7 @@ public class TestRunnerTest {
                 TimeoutTestSubject.class.getName(), "empty2",
                 new String[] { "passing" }
                 ));
-        
+
         TestRunner testRunner = new TestRunner(this.getClass().getClassLoader());
         testRunner.runTests(allCases, 1);
 
@@ -79,27 +79,26 @@ public class TestRunnerTest {
         }
 
     }
-    
+
     @Test
     public void shouldHonorRunWithAnnotation() {
         MockRunner.reset();
-        
+
         TestCaseList allCases = new TestCaseList();
         allCases.add(new TestCase(
                 RunWithTestSubject.class.getName(), "testCase",
                 new String[] {}
                 ));
-        
+
         TestRunner testRunner = new TestRunner(this.getClass().getClassLoader());
-        
+
         assertFalse(MockRunner.runCalled);
         testRunner.runTests(allCases, 1000000);
         if (allCases.get(0).status == TestCase.Status.FAILED) {
             fail("Test failed: " + allCases.get(0).message);
         }
         assertTrue(MockRunner.runCalled);
-        
+
         MockRunner.reset();
     }
 }
-
