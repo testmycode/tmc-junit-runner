@@ -1,5 +1,7 @@
 package fi.helsinki.cs.tmc.testscanner;
 
+import static javax.lang.model.SourceVersion.RELEASE_6;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,7 +11,6 @@ import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
@@ -22,8 +23,10 @@ import org.junit.Test;
 
 /**
  * An annotation processor that records all <code>@Test</code>-annotated methods it sees.
+ *
+ * <p>
+ * @SupportedSourceVersion(value = SourceVersion.RELEASE_6)
  */
-@SupportedSourceVersion(value = SourceVersion.RELEASE_6)
 @SupportedAnnotationTypes(value = {"fi.helsinki.cs.tmc.testrunner.Exercise", "org.junit.Test"})
 class TestMethodAnnotationProcessor extends AbstractProcessor {
 
@@ -67,20 +70,29 @@ class TestMethodAnnotationProcessor extends AbstractProcessor {
         }
         return null;
     }
-    
+
     private String getAnnotationValue(AnnotationMirror am) {
         for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> e : am.getElementValues().entrySet()) {
             if (e.getKey().getSimpleName().contentEquals("value")) {
                 Object value = e.getValue().getValue();
                 if (value instanceof String) {
-                    return (String)value;
+                    return (String) value;
                 }
             }
         }
         return "";
     }
-    
+
     public List<TestMethod> getTestMethods() {
         return Collections.unmodifiableList(testMethods);
+    }
+
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+        if (SourceVersion.latest().compareTo(RELEASE_6) > 0) {
+            return SourceVersion.latestSupported();
+        }
+
+        return RELEASE_6;
     }
 }
