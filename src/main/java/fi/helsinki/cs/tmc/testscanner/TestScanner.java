@@ -15,13 +15,13 @@ import javax.tools.ToolProvider;
 public class TestScanner {
 
     enum OutputFormat { JSON, TEST_RUNNER }
-    
+
     public static void main(String[] args) {
         if (args.length == 0) {
             showHelp();
             System.exit(1);
         }
-        
+
         OutputFormat outputFormat = OutputFormat.JSON;
 
         TestScanner scanner = new TestScanner();
@@ -47,7 +47,7 @@ public class TestScanner {
     private static void showHelp() {
         System.out.println("Usage: java [...] " + TestScanner.class.getName() + " files-or-dirs");
     }
-    
+
     private static String toTestRunnerFormat(List<TestMethod> tests) {
         StringBuilder sb = new StringBuilder();
         for (TestMethod test : tests) {
@@ -57,7 +57,7 @@ public class TestScanner {
         }
         return sb.toString();
     }
-    
+
     private static void commaSeparated(StringBuilder sb, String[] elements) {
         if (elements.length > 0) {
             for (int i = 0; i < elements.length - 1; ++i) {
@@ -66,7 +66,7 @@ public class TestScanner {
             sb.append(elements[elements.length - 1]);
         }
     }
-    
+
     private ArrayList<File> sourceFiles;
     private JavaCompiler compiler;
     private StandardJavaFileManager fileMan;
@@ -107,10 +107,10 @@ public class TestScanner {
         if (sourceFiles.isEmpty()) {
             return Collections.emptyList();
         }
-        
+
         ArrayList<String> args = new ArrayList<String>();
         args.add("-proc:only");
-        
+
         if (classPath != null) {
             args.add("-cp");
             args.add(classPath);
@@ -118,11 +118,26 @@ public class TestScanner {
 
         List<String> options = new ArrayList<String>();
         if (classPath != null) {
+            /*
+            Convert classpath libraries so that they use the absolute path. 
+            This makes it possible to compile the tests regardless of the path
+            in which the compilation is done.
+            */
+
+            StringBuilder libs = new StringBuilder();
+            for (File file : new File(classPath).listFiles()) {
+                if (!file.getName().endsWith("jar")) {
+                    continue;
+                }
+
+                libs.append(file.getAbsolutePath()).append(":");
+            }
+
             options.add("-classpath");
-            options.add(classPath);
+            options.add(libs.toString());
         }
         options.add("-proc:only");
-        
+
         JavaCompiler.CompilationTask task = compiler.getTask(
                 null,
                 null,
@@ -138,7 +153,7 @@ public class TestScanner {
         }
         return stableSortedByClassName(processor.getTestMethods());
     }
-    
+
     private List<TestMethod> stableSortedByClassName(List<TestMethod> unsorted) {
         ArrayList<TestMethod> methods = new ArrayList<TestMethod>(unsorted);
         Collections.sort(methods, new Comparator<TestMethod>() {

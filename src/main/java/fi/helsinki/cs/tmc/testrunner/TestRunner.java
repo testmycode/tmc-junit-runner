@@ -1,5 +1,6 @@
 package fi.helsinki.cs.tmc.testrunner;
 
+import fi.helsinki.cs.tmc.testrunner.TestCase.Status;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import org.junit.runner.Description;
@@ -28,6 +29,26 @@ public class TestRunner {
     
     public TestRunner(ClassLoader testClassLoader) {
         this.testClassLoader = testClassLoader;
+    }
+    
+    /*
+        Tells if the tests have finished running. If one or more tests have
+        ended in a timeout, all tests are considered as having finished.
+    */
+    public boolean isFinished() {
+        boolean isFinished = true;
+        
+        for (TestCase testCase : cases) {
+            if(testCase.message != null && testCase.message.equals("timeout")) {
+                return true;
+            }
+            
+            if(testCase.status == Status.NOT_STARTED || testCase.status == Status.RUNNING) {
+                isFinished = false;
+            }
+        }
+        
+        return isFinished;
     }
     
     public synchronized void runTests(TestCaseList cases, int suiteTimeout) {
@@ -111,7 +132,7 @@ public class TestRunner {
                         currentCase.exception = new CaughtException(ex);
                     }
                 }
-
+                
                 synchronized (lock) {
                     if (Thread.currentThread().isInterrupted()) {
                         break;
